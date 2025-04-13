@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, Text } from 'react-native';
-import Home from '../../screens/Schedules';
-import Home2 from '../../screens/Queue';
+import Schedules from '../../screens/Schedules';
+import Queue from '../../screens/Queue';
 import Zones from '../../screens/Zones';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
+
 
 const Tab = createBottomTabNavigator();
 
@@ -16,23 +17,23 @@ const App = () => {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
-            let iconName = 'Irrigation'
+            let icon = <View></View>;
 
-            if (route.name === 'Irrigation') {
-              iconName = 'Irrigation';
+            if (route.name === 'Zones') {
+              //icon = <MaterialIcons name="house" size={24} color="#2196f3" />
             } else if (route.name === 'Schedules') {
-              iconName = 'Schedules';
+             // icon = <MaterialIcons name="house" size={24} color="#333" />
             } else if (route.name === 'Queue') {
-              iconName = 'Queue';
+              //icon = <MaterialIcons name="house" size={24} color="#333" />
             }
 
-            return <Text>{iconName}</Text>;
+            return icon;
           },
         })}
       >
-        <Tab.Screen name="Irr" component={Home} />
-        <Tab.Screen name="Schedules" component={Home2} />
-        <Tab.Screen name="Queue" component={Zones} />
+        <Tab.Screen name="Zones" component={Zones} />
+        <Tab.Screen name="Schedules" component={Schedules} />
+        <Tab.Screen name="Queue" component={Queue} />
       </Tab.Navigator>
     </NavigationContainer>
   );
