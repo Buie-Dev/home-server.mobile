@@ -9,7 +9,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 
 function Zones(): ReactElement {
-	const { fetchZones, zones } = useIrrigation();
+	const { fetchZones, zones, priorityQueue } = useIrrigation();
 	const [selectedZone, setSelectedZone] = useState<Zone>()
 
 	useEffect(() => {
@@ -23,14 +23,14 @@ function Zones(): ReactElement {
 		<View>
 			<ScrollView contentContainerStyle={styles.container}>
 				<Text style={styles.title}>Irrigation Zone</Text>
-				{zones.map((z: Zone) => {
+				{zones.map((z: Zone, index: number) => {
 					const hasSubZones = z.subzones && z.subzones.length > 0;
 					const isActive = z.state
-
+					const pqItem =  priorityQueue.find(pq => pq.zone === z.zone)
 					return (
 						<View key={z.id} >
 							{/* Zone Row */}
-							<TouchableOpacity style={[styles.zoneCard, isActive && styles.active]} onPress={() => setSelectedZone(z)} >
+							<TouchableOpacity style={[styles.zoneCard, !!pqItem && styles.queued, isActive && styles.active]} onPress={() => setSelectedZone(z)} >
 								<Text style={styles.zoneText}>{z.name}</Text>
 							</TouchableOpacity>
 						</View>
@@ -98,5 +98,8 @@ const styles = StyleSheet.create({
 	},
 	active: {
 		backgroundColor: 'green'
+	},
+	queued: {
+		backgroundColor: 'orange'
 	}
 });

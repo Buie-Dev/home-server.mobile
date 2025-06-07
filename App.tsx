@@ -6,7 +6,7 @@ import { View, Text } from 'react-native';
 import Home from './screens/Schedules';
 import Home2 from './screens/Queue';
 import Zones from './screens/Zones';
-import NavigationLayout from './components/NavigationLayout/NavigationLayout'
+import IrrigationPage from './components/IrrigationPage/IrrigationPage'
 import { WebSocketProvider } from './context/WebSocketContext';
 
 const Tab = createBottomTabNavigator();
@@ -14,7 +14,7 @@ const Tab = createBottomTabNavigator();
 const App = () => {
   return (
 		<WebSocketProvider>
-			<NavigationLayout />
+			<IrrigationPage />
 		</WebSocketProvider>
     
   );

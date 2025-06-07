@@ -29,7 +29,7 @@ interface TextFieldProps {
 	setValue: (value: string) => void;
 	inputMode?: InputMode
 	keyboardType?: KeyboardType
-	label: string;
+	label?: string;
 }
 
 function TextField(params: TextFieldProps): ReactElement {

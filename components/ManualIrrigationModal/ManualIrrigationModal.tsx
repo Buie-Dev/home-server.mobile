@@ -1,10 +1,11 @@
 import React, { ReactElement, useContext, useEffect, useState } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import BaseModal from '../BaseModal/BaseModal';
 import TextField, { InputMode, KeyboardType } from '../TextField/TextField';
 import { Subzone, Zone } from '../../hooks/useIrrigation.hook';
 import CheckBox from '@react-native-community/checkbox';
 import { useWebSocket } from '../../context/WebSocketContext';
+import Checkbox from '../Checkbox/Checkbox';
 
 interface ManualIrrigationModelProps {
 	open: boolean;
@@ -18,14 +19,13 @@ type SubzoneControl = Subzone & {
 
 function ManualIrrigationModel({open, zone, onClose}: ManualIrrigationModelProps): ReactElement {
 
-	const [time, setTime] = useState<number>(15)
+	const [time, setTime] = useState<string>('')
 	const [subzones, setSubzones] = useState<SubzoneControl[]>([])
 
 	const { sendMessage } = useWebSocket()
 	
 	const handleChange = (text: string) => {
-		const numericValue = text.replace(/[^0-9]/g, '');
-		setTime(+numericValue);
+		setTime(text);
 	};
 
 	const onCheckSubzones = (sz: SubzoneControl) => {
@@ -42,9 +42,10 @@ function ManualIrrigationModel({open, zone, onClose}: ManualIrrigationModelProps
 	}
 
 	const startZone = () => {
+		if (!time) return
 		sendMessage('request', {
 			priority: 1,
-			duration: time,
+			duration: +time,
 			zone: zone!.zone,
 			subzones: subzones.filter(sz => sz.isChecked).map(sz => ({
 				id: sz.subzone,
@@ -61,29 +62,30 @@ function ManualIrrigationModel({open, zone, onClose}: ManualIrrigationModelProps
 
 	return (
 		<BaseModal open={open} onClose={onClose} onAction={startZone} actionTitle='Start'>
+			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+			<View style={{}}>
 
-			<Text style={styles.title}>{zone?.name}</Text>
-			
-			<TextField 
-				value={time}
-				setValue={handleChange}
-				label={"Duration"}
-				keyboardType={KeyboardType.Numeric}
-				inputMode={InputMode.Numeric}
-			/>
-			{subzones.map(sz => (
-				<View key={sz.id} style={styles.subzone}>
-					<View style={{ transform: [{ scale: 0.8 }] }}>
-						<CheckBox
-							value={sz.isChecked}
-							onValueChange={() => onCheckSubzones(sz)}
-							tintColors={{ true: '#4caf50', false: '#aaa' }}
+				<Text style={styles.title}>{zone?.name}</Text>
+						
+						<TextField 
+							value={time}
+							setValue={handleChange}
+							label={"Duration"}
+							keyboardType={KeyboardType.Numeric}
+							inputMode={InputMode.Numeric}
 						/>
-					</View>
-					<Text style={styles.subzoneName}>{sz.name}</Text>
+						{subzones.map(sz => (
+							<View key={sz.id} style={styles.subzone}>
+								<Checkbox label={sz.name} setChecked={() => onCheckSubzones(sz)} checked={!!sz.isChecked}/>
+							</View>
+						))}
 
-				</View>
-			))}
+			</View>
+		
+			</TouchableWithoutFeedback>	
+			
+		
+
 		</BaseModal>
 		
 	)

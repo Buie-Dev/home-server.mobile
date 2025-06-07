@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { AppState, AppStateStatus } from "react-native";
+import { baseWebSocketUrl } from '../config/config'
 
-const WS_URL = "ws://192.168.1.100:8765"; // Replace with your WebSocket server URL
 
 export enum WEBSOCKET_TOPICS {
 	CURRENT_STATE = 'current',
@@ -30,6 +31,7 @@ export type CurrentQueueState = {
 	duration: number;
 	zone: number;
 	priority: number;
+	start_time?: string;
 	subzones?: Array<{id: number, state: boolean}>
 }
 
@@ -43,49 +45,62 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 	const [latestCurrentQueueStates, setLatestCurrentQueueStates] = useState<Array<CurrentQueueState>>([])
   const [isConnected, setIsConnected] = useState(false);
 
-  useEffect(() => {
-    const socket = new WebSocket(WS_URL);
-
-    socket.onopen = () => {
-      console.log("Connected to WebSocket server");
-      setIsConnected(true);
-    };
-
-    socket.onmessage = (event) => {
-      console.log("Received:", event.data);
-			const content = JSON.parse(event.data)
-			console.log(content.topic)
-			switch (content.topic) {
-				case WEBSOCKET_TOPICS.CURRENT_STATE:
-					console.log(content.message)
-					setLatestCurrentStates(JSON.parse(content.message));
-					break
-				case WEBSOCKET_TOPICS.PRIORITY_QUEUE:
-					setLatestCurrentQueueStates(JSON.parse(content.message));
-					break
-				default:
-					console.log("Topic not controlled in Irrigation")
+	useEffect(() => {
+		let socket: WebSocket;
+	
+		const connect = () => {
+			console.log("Connecting to WebSocket...");
+			socket = new WebSocket(baseWebSocketUrl);
+	
+			socket.onopen = () => {
+				console.log("Connected to WebSocket server");
+				setIsConnected(true);
+			};
+	
+			socket.onmessage = (event) => {
+				const content = JSON.parse(event.data);
+				switch (content.topic) {
+					case WEBSOCKET_TOPICS.CURRENT_STATE:
+						setLatestCurrentStates(JSON.parse(content.message));
+						break;
+					case WEBSOCKET_TOPICS.PRIORITY_QUEUE:
+						setLatestCurrentQueueStates(JSON.parse(content.message));
+						break;
+					default:
+						console.log("Topic not handled:", content.topic);
+				}
+			};
+	
+			socket.onerror = (error) => {
+				console.error("WebSocket Error:", error);
+			};
+	
+			socket.onclose = () => {
+				console.log("WebSocket Disconnected");
+				setIsConnected(false);
+			};
+	
+			setWs(socket);
+		};
+	
+		connect(); // Initial connection
+	
+		const handleAppStateChange = (nextAppState: AppStateStatus) => {
+			if (nextAppState === 'active') {
+				console.log("App has come to the foreground — reconnecting WebSocket");
+				if (!socket || socket.readyState !== WebSocket.OPEN) {
+					connect();
+				}
 			}
-    };
-
-    socket.onerror = (error) => {
-      console.error("WebSocket Error:", error);
-    };
-
-    socket.onclose = () => {
-      console.log("WebSocket Disconnected");
-      setIsConnected(false);
-      setTimeout(() => {
-        setWs(new WebSocket(WS_URL)); // Reconnect after 5 seconds
-      }, 5000);
-    };
-
-    setWs(socket);
-
-    return () => {
-      socket.close();
-    };
-  }, []);
+		};
+	
+		const subscription = AppState.addEventListener('change', handleAppStateChange);
+	
+		return () => {
+			socket?.close();
+			subscription.remove();
+		};
+	}, []);
 
   const sendMessage = (topic: string, message: any) => {
     if (ws && isConnected) {

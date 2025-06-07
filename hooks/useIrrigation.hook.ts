@@ -35,6 +35,7 @@ export type PriorityQueue = {
 	duration: number;
 	zone: number;
 	priority: number;
+	startTime?: number;
 	subZones?: Array<QueueSubzone>
 }
 export type QueueSubzone = {
@@ -43,21 +44,55 @@ export type QueueSubzone = {
 	zone: number;
 }
 
+export type Schedule = {
+	id: number;
+	name: string;
+	startTime: string;
+	duration: number;
+	monday: boolean;
+	tuesday: boolean;
+	wednesday: boolean;
+	thursday: boolean;
+	friday: boolean;
+	saturday: boolean;
+	sunday: boolean;
+}
+
+export type CreateScheduleParams = {
+	name: string;
+	startTime: string;
+	duration: number;
+	monday: boolean;
+	tuesday: boolean;
+	wednesday: boolean;
+	thursday: boolean;
+	friday: boolean;
+	saturday: boolean;
+	sunday: boolean;
+}
+
 
 
 interface IrrigationInfo {
 	fetchZones: () => void;
+	stopAll: () => void;
+	stopQueueItem: (id: string) => void;
+	fetchSchedules: () => void;
+	createSchedule: (data: CreateScheduleParams) => Promise<void>;
+	deleteSchedule: (id: number) => Promise<void>;
 	zones: Array<Zone>
 	priorityQueue: Array<PriorityQueue>
+	schedules: Array<Schedule>
 }
 
 function useIrrigation(): IrrigationInfo {
 
-	const { latestCurrentQueueStates, latestCurrentStates } = useWebSocket();
+	const { latestCurrentQueueStates, latestCurrentStates, sendMessage } = useWebSocket();
 
 	const [zoneDetails, setZoneDetails] = useState<Array<ZoneDetail>>([])
 
 	const [zones, setZones] = useState<Array<Zone>>([])
+	const [schedules, setSchedules] = useState<Array<Schedule>>([])
 	const [priorityQueue, setPriorityQueue] = useState<Array<PriorityQueue>>([])
 
 	const formatZones = (): Array<Zone> => {
@@ -129,13 +164,50 @@ function useIrrigation(): IrrigationInfo {
 				zone: latestCurrentQueueState.zone,
 				name: zoneDetail.name,
 				priority: latestCurrentQueueState.priority,
-				subZones: queueSubZones ? queueSubZones : undefined
+				subZones: queueSubZones ? queueSubZones : undefined,
+				startTime: latestCurrentQueueState.start_time ? parseInt(latestCurrentQueueState.start_time) : undefined
 			}
 			priorityQueue.push(queueItem)
 
 
 		}
 		return priorityQueue
+	}
+
+
+	const stopAll = () => {
+		sendMessage('stopAll', {})
+	}
+
+	const stopQueueItem = (id: string) => {
+		sendMessage('stop', { id })
+	}
+
+
+	const fetchSchedules = async () => {
+		try {
+			const schedules = await irrigationApi.fetchSchedules()
+			console.log(schedules)
+			setSchedules(schedules)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	const createSchedule = async (data: CreateScheduleParams) => {
+		try {
+			await irrigationApi.createSchedule(data)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	const deleteSchedule = async (id: number) => {
+		try {
+			await irrigationApi.deleteSchedule(id)
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 
@@ -165,6 +237,12 @@ function useIrrigation(): IrrigationInfo {
 
 	return  {
 		fetchZones,
+		stopAll,
+		stopQueueItem,
+		deleteSchedule,
+		createSchedule,
+		fetchSchedules,
+		schedules,
 		zones,
 		priorityQueue,
 	}

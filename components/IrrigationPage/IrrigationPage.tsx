@@ -1,16 +1,15 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import Schedules from '../../screens/Schedules';
 import Queue from '../../screens/Queue';
 import Zones from '../../screens/Zones';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 
 const Tab = createBottomTabNavigator();
 
-const App = () => {
+const IrrigationPage = () => {
   return (
 	
     <NavigationContainer>
@@ -39,4 +38,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default IrrigationPage;
