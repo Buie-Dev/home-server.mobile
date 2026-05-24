@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Platform, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import TextField, { InputMode, KeyboardType } from '../TextField/TextField';
 
@@ -8,8 +8,6 @@ interface TimePickerProps {
 	hour: string;
   onChange: (hour: string, minute: string) => void; // return string in HH:mm
 }
-
-
 
 const formatDateToHHMM = (date: Date): string => {
   const pad = (n: number) => n.toString().padStart(2, '0');
@@ -21,7 +19,15 @@ const TimePicker: React.FC<TimePickerProps> = ({ onChange, hour, minute }) => {
 	const [localMinutes, setLocalMinutes] = useState<string>('')
 
   const changeTime = (hour:  string, minute: string) => {
-		onChange(hour, minute)
+		let localHour = hour;
+		let localMinute = minute;
+		if (parseInt(hour) > 23) {
+			localHour = '23';
+		}
+		if (parseInt(minute) > 59) {
+			localMinute = '59';
+		}
+		onChange(localHour, localMinute)
 	}
 
 	useEffect(() => {
@@ -30,21 +36,52 @@ const TimePicker: React.FC<TimePickerProps> = ({ onChange, hour, minute }) => {
 	}, [hour, minute])
 
   return (
-    <View style={{ padding: 10 }}>
-      <TextField 
-				value={hour}
-				setValue={(hour: string) => changeTime(hour, localMinutes)}
-				inputMode={InputMode.Numeric}
-				keyboardType={KeyboardType.NumberPad}
-			/>
-			<TextField 
-				value={localMinutes}
-				setValue={(minute: string) => changeTime(localHour, minute)}
-				inputMode={InputMode.Numeric}
-				keyboardType={KeyboardType.NumberPad}
-			/>
+    <View style={styles.container}>
+      <View style={styles.timeContainer}>
+        <View style={styles.inputContainer}>
+          <TextField 
+            value={hour}
+						label={"Hour"}
+            setValue={(hour: string) => changeTime(hour, localMinutes)}
+            inputMode={InputMode.Numeric}
+            keyboardType={KeyboardType.NumberPad}
+          />
+        </View>
+        <Text style={styles.separator}>:</Text>
+        <View style={styles.inputContainer}>
+          <TextField 
+            value={localMinutes}
+						label={"Minute"}
+            setValue={(minute: string) => changeTime(localHour, minute)}
+            inputMode={InputMode.Numeric}
+            keyboardType={KeyboardType.NumberPad}
+          />
+        </View>
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 0,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputContainer: {
+    flex: 1,
+  },
+  label: {
+    marginBottom: 5,
+    textAlign: 'center',
+  },
+  separator: {
+    fontSize: 24,
+    marginHorizontal: 10,
+  },
+});
 
 export default TimePicker

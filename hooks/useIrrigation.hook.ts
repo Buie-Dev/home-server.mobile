@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import * as irrigationApi from '../api/irrigation.api'
-import { useWebSocket, WEBSOCKET_TOPICS } from '../context/WebSocketContext';
+import { useWebSocket } from '../context/WebSocketContext';
 
 export type ZoneDetail = {
 	id: number;
 	name: string;
 	zone: number;
+	type: string;
 	subzones?: SubZoneDetail[]
 }
 
@@ -26,6 +27,7 @@ export type Zone = {
 	name: string;
 	state: boolean;
 	zone: number;
+	type: string;
 	subzones?: Subzone[]
 }
 
@@ -34,6 +36,7 @@ export type PriorityQueue = {
 	name: string;
 	duration: number;
 	zone: number;
+	zoneType: string;
 	priority: number;
 	startTime?: number;
 	subZones?: Array<QueueSubzone>
@@ -56,6 +59,11 @@ export type Schedule = {
 	friday: boolean;
 	saturday: boolean;
 	sunday: boolean;
+	subzoneNames?: string;
+	subzoneIds: number[];
+	zoneName: string;
+	zoneId: number;
+	active: boolean;
 }
 
 export type CreateScheduleParams = {
@@ -69,35 +77,67 @@ export type CreateScheduleParams = {
 	friday: boolean;
 	saturday: boolean;
 	sunday: boolean;
+	zoneId: number;
+	subzoneIds?: Array<number>
+}
+
+export type ZoneType = {
+	id: number;
+	type: string;
 }
 
 
 
+export type SyncStatus = {
+	in_sync: boolean;
+	missing_from_automation: number[];
+	mismatched: { id: number; diffs: string[] }[];
+	extra_in_automation: number[];
+	error?: string;
+	timeout?: boolean;
+}
+
 interface IrrigationInfo {
-	fetchZones: () => void;
+	fetchZones: (zoneTypeId?: number) => void;
+	healthCheck: () => void;
 	stopAll: () => void;
 	stopQueueItem: (id: string) => void;
-	fetchSchedules: () => void;
+	fetchSchedules: (zoneId?: number, subzoneId?: number) => void;
 	createSchedule: (data: CreateScheduleParams) => Promise<void>;
+	updateSchedule: (id: number, data: CreateScheduleParams) => Promise<void>;
 	deleteSchedule: (id: number) => Promise<void>;
+	toggleSchedule: (id: number, active: boolean) => Promise<void>;
+	fetchZoneTypes: () => void;
+	checkSync: () => Promise<SyncStatus | null>;
+	forceSync: () => Promise<{ synced: number } | null>;
 	zones: Array<Zone>
 	priorityQueue: Array<PriorityQueue>
 	schedules: Array<Schedule>
+	zoneTypes: Array<ZoneType>
+	zoneDetails: Array<ZoneDetail>
+	connected: boolean,
 }
 
 function useIrrigation(): IrrigationInfo {
-
 	const { latestCurrentQueueStates, latestCurrentStates, sendMessage } = useWebSocket();
 
 	const [zoneDetails, setZoneDetails] = useState<Array<ZoneDetail>>([])
-
 	const [zones, setZones] = useState<Array<Zone>>([])
 	const [schedules, setSchedules] = useState<Array<Schedule>>([])
 	const [priorityQueue, setPriorityQueue] = useState<Array<PriorityQueue>>([])
+	const [zoneTypes, setZoneTypes] = useState<Array<ZoneType>>([])
+	const [connected, setConnected] = useState<boolean>(false);
+
+	const fetchZoneTypes = async () => {
+		try {
+			const zoneTypes = await irrigationApi.fetchZoneTypes()
+			setZoneTypes(zoneTypes as Array<ZoneType>)
+		} catch (error) {
+			console.log(error)
+		}	
+	}
 
 	const formatZones = (): Array<Zone> => {
-		console.log(latestCurrentStates)
-		console.log(zoneDetails)
 		if (!latestCurrentStates || !zoneDetails.length) return []
 
 		const zones: Array<Zone> = []
@@ -109,6 +149,7 @@ function useIrrigation(): IrrigationInfo {
 				id: zoneDetail.id,
 				name: zoneDetail.name,
 				zone: zoneDetail.zone,
+				type: zoneDetail.type,
 				state: !!latestCurrentState.state
 			}
 
@@ -133,8 +174,6 @@ function useIrrigation(): IrrigationInfo {
 	}
 
 	const formatQueue = (): Array<PriorityQueue> => {
-		console.log(zoneDetails)
-		console.log(latestCurrentQueueStates)
 		if (!latestCurrentQueueStates || !zoneDetails.length) return []
 	
 		
@@ -142,13 +181,12 @@ function useIrrigation(): IrrigationInfo {
 		for (const latestCurrentQueueState of  latestCurrentQueueStates) {
 
 			const zoneDetail = zoneDetails.find(zd => zd.zone === latestCurrentQueueState.zone)
-			console.log(zoneDetail)
 			if (!zoneDetail) continue;
 			
 			const queueSubZones: Array<QueueSubzone> = []
 			if (latestCurrentQueueState.subzones && zoneDetail.subzones) {
 				for (const subState of latestCurrentQueueState.subzones) {
-					const subZone = zoneDetail.subzones.find(slz => slz.id === subState.id)
+					const subZone = zoneDetail.subzones.find(slz => slz.subzone === subState.id)
 					if (!subZone) continue;
 					queueSubZones.push({
 						name: subZone.name,
@@ -163,6 +201,7 @@ function useIrrigation(): IrrigationInfo {
 				duration: latestCurrentQueueState.duration,
 				zone: latestCurrentQueueState.zone,
 				name: zoneDetail.name,
+				zoneType: zoneDetail.type,
 				priority: latestCurrentQueueState.priority,
 				subZones: queueSubZones ? queueSubZones : undefined,
 				startTime: latestCurrentQueueState.start_time ? parseInt(latestCurrentQueueState.start_time) : undefined
@@ -184,11 +223,10 @@ function useIrrigation(): IrrigationInfo {
 	}
 
 
-	const fetchSchedules = async () => {
+	const fetchSchedules = async (zoneId?: number, subzoneId?: number) => {
 		try {
-			const schedules = await irrigationApi.fetchSchedules()
-			console.log(schedules)
-			setSchedules(schedules)
+			const schedules = await irrigationApi.fetchSchedules(zoneId, subzoneId)
+			setSchedules(schedules as Array<Schedule>)
 		} catch (error) {
 			console.log(error)
 		}
@@ -202,6 +240,14 @@ function useIrrigation(): IrrigationInfo {
 		}
 	}
 
+	const updateSchedule = async (id: number, data: CreateScheduleParams) => {
+		try {
+			await irrigationApi.updateSchedule(id, data)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
 	const deleteSchedule = async (id: number) => {
 		try {
 			await irrigationApi.deleteSchedule(id)
@@ -210,19 +256,68 @@ function useIrrigation(): IrrigationInfo {
 		}
 	}
 
-
-	const fetchZones = async () => {
+	const checkSync = async (): Promise<SyncStatus | null> => {
 		try {
-			const zones = await irrigationApi.fetchZones()
-			setZoneDetails(zones)
+			return await irrigationApi.checkScheduleSync() as SyncStatus;
+		} catch (error) {
+			console.log(error);
+			return null;
+		}
+	}
+
+	const forceSync = async (): Promise<{ synced: number } | null> => {
+		try {
+			return await irrigationApi.forceScheduleSync() as { synced: number };
+		} catch (error) {
+			console.log(error);
+			return null;
+		}
+	}
+
+	const toggleSchedule = async (id: number, active: boolean) => {
+		try {
+			await irrigationApi.toggleSchedule(id, active)
+			await fetchSchedules()
 		} catch (error) {
 			console.log(error)
 		}
 	}
 
+	const fetchZones = async (zoneTypeId?: number) => {
+		try {
+			const zones = await irrigationApi.fetchZones(zoneTypeId)
+			setZoneDetails(zones as Array<ZoneDetail>)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	const healthCheck = async () => {
+		try {
+			await irrigationApi.healthCheck();
+			setConnected(true);
+		} catch (error) {
+			console.error('Health check failed:', error);
+			setConnected(false);
+		}
+	};
+
+	useEffect(() => {
+		// Fetch zone details needed to format queue and zone state
+		fetchZones();
+
+		// Initial health check
+		healthCheck();
+
+		// Set up interval for health checks every minute
+		const intervalId = setInterval(healthCheck, 60000);
+
+		// Cleanup interval on unmount
+		return () => clearInterval(intervalId);
+	}, []);
+
 	useEffect(() => {
 		const queues = formatQueue()
-		console.log(queues)
 		setPriorityQueue(queues)
 	}, [latestCurrentQueueStates, zoneDetails])
 
@@ -241,10 +336,19 @@ function useIrrigation(): IrrigationInfo {
 		stopQueueItem,
 		deleteSchedule,
 		createSchedule,
+		updateSchedule,
 		fetchSchedules,
+		toggleSchedule,
+		checkSync,
+		forceSync,
 		schedules,
 		zones,
 		priorityQueue,
+		fetchZoneTypes,
+		zoneTypes,
+		zoneDetails,
+		healthCheck,
+		connected
 	}
 
 }

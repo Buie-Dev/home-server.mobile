@@ -1,45 +1,40 @@
 import CheckBox from '@react-native-community/checkbox';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { COLORS, SPACING } from '../../lib/theme';
 
 interface CheckboxProps {
-	setChecked: () => void
-	checked: boolean
-	label: string
+  setChecked: () => void;
+  checked: boolean;
+  label: string;
 }
-function Checkbox({checked, setChecked, label}: CheckboxProps) {
 
+function Checkbox({ checked, setChecked, label }: CheckboxProps) {
   return (
-    <View style={styles.container}>
-			<View style={{ transform: [{ scale: 0.8 }] }}>
-				<CheckBox
-					value={checked}
-					onValueChange={setChecked}
-					tintColors={{ true: '#4caf50', false: '#aaa' }}
-				/>
-			</View>
-			<Text style={styles.label}>{label}</Text>
-
-		</View>
+    <TouchableOpacity style={styles.container} onPress={setChecked} activeOpacity={0.7}>
+      <View style={{ transform: [{ scale: 0.85 }] }}>
+        <CheckBox
+          value={checked}
+          onValueChange={() => {}}
+          tintColors={{ true: COLORS.primary, false: COLORS.border }}
+        />
+      </View>
+      <Text style={styles.label}>{label}</Text>
+    </TouchableOpacity>
   );
-};
-
+}
 
 const styles = StyleSheet.create({
-	container: {
-		display: 'flex',
-		flexDirection: 'row',
-		marginBottom: 10,
-
-		textAlign: 'center'
-
-	},
-	label: {
-		height: 30,
-		lineHeight: 30,
-		textAlign: 'center',
-		marginLeft: 10,
-	}
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.xs,
+  },
+  label: {
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    marginLeft: SPACING.xs,
+    flex: 1,
+  },
 });
 
-
-export default Checkbox
+export default Checkbox;

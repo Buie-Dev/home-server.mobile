@@ -1,131 +1,98 @@
-import React, { ReactElement, useContext, useEffect, useState } from 'react'
-import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import BaseModal from '../BaseModal/BaseModal';
 import TextField, { InputMode, KeyboardType } from '../TextField/TextField';
 import { Subzone, Zone } from '../../hooks/useIrrigation.hook';
-import CheckBox from '@react-native-community/checkbox';
-import { useWebSocket } from '../../context/WebSocketContext';
 import Checkbox from '../Checkbox/Checkbox';
+import { useWebSocket } from '../../context/WebSocketContext';
+import { COLORS, SPACING } from '../../lib/theme';
 
 interface ManualIrrigationModelProps {
-	open: boolean;
-	zone?: Zone;
-	onClose: () => void;
+  open: boolean;
+  zone?: Zone;
+  onClose: () => void;
 }
 
 type SubzoneControl = Subzone & {
-	isChecked?: boolean;
-}
+  isChecked?: boolean;
+};
 
-function ManualIrrigationModel({open, zone, onClose}: ManualIrrigationModelProps): ReactElement {
+function ManualIrrigationModel({ open, zone, onClose }: ManualIrrigationModelProps): ReactElement {
+  const [time, setTime] = useState<string>('');
+  const [subzones, setSubzones] = useState<SubzoneControl[]>([]);
+  const { sendMessage } = useWebSocket();
 
-	const [time, setTime] = useState<string>('')
-	const [subzones, setSubzones] = useState<SubzoneControl[]>([])
+  useEffect(() => {
+    setSubzones(zone?.subzones ?? []);
+    setTime('');
+  }, [zone]);
 
-	const { sendMessage } = useWebSocket()
-	
-	const handleChange = (text: string) => {
-		setTime(text);
-	};
-
-	const onCheckSubzones = (sz: SubzoneControl) => {
+  const onCheckSubzones = (sz: SubzoneControl) => {
 		console.log(sz)
-		const temp: SubzoneControl[] = [...subzones]
-		console.log(temp)
-		const sub = temp.find(t => t.id === sz.id)
-		console.log(sub)
-		if (!sub) return;
+		console.log(sz.isChecked)
+		console.log(!sz.isChecked)
 
-		sub.isChecked = !sub.isChecked
-		console.log(temp)
-		setSubzones(temp)
-	}
+    setSubzones(prev =>
+      prev.map(s => s.id === sz.id ? { ...s, isChecked: !s.isChecked } : s)
+    );
+  };
 
-	const startZone = () => {
-		if (!time) return
-		sendMessage('request', {
-			priority: 1,
-			duration: +time,
-			zone: zone!.zone,
-			subzones: subzones.filter(sz => sz.isChecked).map(sz => ({
-				id: sz.subzone,
-				state: 1
-			}))
-		})
-		onClose()
-	}
+  const startZone = () => {
+    if (!time) return;
+		console.log(subzones)
+		console.log(subzones.filter(sz => sz.isChecked).map(sz => ({ id: sz.subzone, state: 1 })))
+    sendMessage('request', {
+      priority: 1,
+      duration: +time,
+      zone: zone!.zone,
+      subzones: subzones.filter(sz => sz.isChecked).map(sz => ({ id: sz.subzone, state: 1 })),
+    });
+    onClose();
+  };
 
 	useEffect(() => {
-		if (!zone) setSubzones([])
-		setSubzones(zone?.subzones ? zone.subzones : [])
-	}, [zone])
+		console.log(subzones)
+		console.log(subzones.filter(sz => sz.isChecked).map(sz => ({ id: sz.subzone, state: 1 })))
+	}, [subzones])
 
-	return (
-		<BaseModal open={open} onClose={onClose} onAction={startZone} actionTitle='Start'>
-			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-			<View style={{}}>
-
-				<Text style={styles.title}>{zone?.name}</Text>
-						
-						<TextField 
-							value={time}
-							setValue={handleChange}
-							label={"Duration"}
-							keyboardType={KeyboardType.Numeric}
-							inputMode={InputMode.Numeric}
-						/>
-						{subzones.map(sz => (
-							<View key={sz.id} style={styles.subzone}>
-								<Checkbox label={sz.name} setChecked={() => onCheckSubzones(sz)} checked={!!sz.isChecked}/>
-							</View>
-						))}
-
-			</View>
-		
-			</TouchableWithoutFeedback>	
-			
-		
-
-		</BaseModal>
-		
-	)
+  return (
+    <BaseModal open={open} title={zone?.name} onClose={onClose} onAction={startZone} actionTitle="Start">
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View>
+          <TextField
+            value={time}
+            setValue={setTime}
+            label="Duration (minutes)"
+            keyboardType={KeyboardType.DecimalPad}
+            inputMode={InputMode.Decimal}
+            placeholder="e.g. 10"
+          />
+          {subzones.length > 0 && (
+            <>
+              <Text style={styles.subzoneLabel}>Subzones</Text>
+              {subzones.map(sz => (
+                <Checkbox
+                  key={sz.id}
+                  label={sz.name}
+                  checked={!!sz.isChecked}
+                  setChecked={() => onCheckSubzones(sz)}
+                />
+              ))}
+            </>
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+    </BaseModal>
+  );
 }
 
-
 const styles = StyleSheet.create({
-
-	title: {
-		fontSize: 20,
-		margin: 'auto'
-	}, 
-	textInput: {
-		width: '80%',
-		borderWidth: 1,
-		borderColor: '#ccc',
-		padding: 10,
-		marginBottom: 10,
-		borderRadius: 5,
-		fontSize: 18,
-	},
-	checkbox: {
-		transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }]
-	},
-	subzone: {
-		display: 'flex',
-		flexDirection: 'row',
-		marginBottom: 10,
-
-		textAlign: 'center'
-
-	},
-	subzoneName: {
-		height: 30,
-		lineHeight: 30,
-		textAlign: 'center',
-		marginLeft: 10,
-	}
+  subzoneLabel: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.sm,
+  },
 });
-
-
 
 export default ManualIrrigationModel;

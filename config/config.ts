@@ -1,7 +1,9 @@
-import { REACT_APP_SERVER, REACT_APP_API_PORT, REACT_APP_WEB_SOCKET_PORT, REACT_APP_WEBSOCKET} from '@env';
+import { REACT_APP_SERVER, REACT_APP_API_PORT, REACT_APP_WEB_SOCKET_PORT, REACT_APP_WEBSOCKET, REACT_APP_NGROK_DOMAIN } from '@env';
 
-export const baseAPIUrl = `http://${REACT_APP_SERVER}:${REACT_APP_API_PORT}`;
-export const baseWebSocketUrl = `ws://${REACT_APP_WEBSOCKET}:${REACT_APP_WEB_SOCKET_PORT}`
+export const baseAPIUrl = REACT_APP_NGROK_DOMAIN
+  ? `https://${REACT_APP_NGROK_DOMAIN}/api`
+  : `http://${REACT_APP_SERVER}:${REACT_APP_API_PORT}`;
 
-console.log(baseAPIUrl)
-console.log(baseWebSocketUrl)
+export const baseWebSocketUrl = REACT_APP_NGROK_DOMAIN
+  ? `wss://${REACT_APP_NGROK_DOMAIN}/ws`
+  : `ws://${REACT_APP_WEBSOCKET}:${REACT_APP_WEB_SOCKET_PORT}`;
