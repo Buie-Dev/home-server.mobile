@@ -7,18 +7,22 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { TodoCategory } from '../../hooks/useTodo.hook';
 import { COLORS, SPACING, RADIUS } from '../../lib/theme';
 
-type Frequency = 'one_time' | 'daily' | 'weekly' | 'monthly';
+type Frequency = 'one_time' | 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
 
-const FREQUENCIES: Frequency[] = ['one_time', 'daily', 'weekly', 'monthly'];
+const FREQUENCIES: Frequency[] = ['one_time', 'daily', 'weekly', 'monthly', 'quarterly', 'yearly'];
 const FREQUENCY_LABEL: Record<Frequency, string> = {
   one_time: 'One Time',
   daily: 'Daily',
   weekly: 'Weekly',
   monthly: 'Monthly',
+  quarterly: 'Quarterly',
+  yearly: 'Yearly',
 };
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 type DirectTaskData = { title: string; notes?: string; categoryId: number; subcategoryId?: number };
-type TemplateTaskData = DirectTaskData & { frequency: Frequency };
+type TemplateTaskData = DirectTaskData & { frequency: Frequency; month?: number };
 
 type Props = {
   visible: boolean;
@@ -33,8 +37,9 @@ function AddTaskModal({ visible, categories, onClose, onSaveDirect, onSaveAsTemp
   const [notes, setNotes] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | null>(null);
-  const [makeTemplate, setMakeTemplate] = useState(false);
+  const [makeTemplate, setMakeTemplate] = useState<boolean>(false);
   const [frequency, setFrequency] = useState<Frequency>('one_time');
+  const [month, setMonth] = useState<number>(1);
 
   useEffect(() => {
     if (!visible) return;
@@ -44,6 +49,7 @@ function AddTaskModal({ visible, categories, onClose, onSaveDirect, onSaveAsTemp
     setSelectedSubcategoryId(null);
     setMakeTemplate(false);
     setFrequency('one_time');
+    setMonth(1);
   }, [visible]);
 
   const selectedCategory = categories.find(c => c.id === selectedCategoryId) ?? null;
@@ -70,7 +76,7 @@ function AddTaskModal({ visible, categories, onClose, onSaveDirect, onSaveAsTemp
       subcategoryId: selectedSubcategoryId ?? undefined,
     };
     if (makeTemplate) {
-      onSaveAsTemplate({ ...base, frequency });
+      onSaveAsTemplate({ ...base, frequency, month: frequency === 'yearly' ? month : undefined });
     } else {
       onSaveDirect(base);
     }
@@ -159,6 +165,25 @@ function AddTaskModal({ visible, categories, onClose, onSaveDirect, onSaveAsTemp
                     </TouchableOpacity>
                   ))}
                 </View>
+                {frequency === 'yearly' && (
+                  <>
+                    <Text style={styles.label}>Month</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={styles.chipRow}>
+                      {MONTHS.map((name, idx) => {
+                        const monthNum = idx + 1;
+                        return (
+                          <TouchableOpacity
+                            key={monthNum}
+                            style={[styles.chip, month === monthNum && styles.chipActive]}
+                            onPress={() => setMonth(monthNum)}
+                          >
+                            <Text style={[styles.chipText, month === monthNum && styles.chipTextActive]}>{name}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+                  </>
+                )}
               </>
             )}
 

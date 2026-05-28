@@ -16,10 +16,10 @@ export const deleteSubcategory = (id: number) => del(`${TODO}/subcategories/${id
 export const fetchTemplates = (categoryId?: number, subcategoryId?: number) =>
   get<any[]>(`${TODO}/templates`, { categoryId, subcategoryId });
 export const createTemplate = (data: {
-  title: string; notes?: string; categoryId: number; subcategoryId?: number; frequency: string; checklistItems?: string[];
+  title: string; notes?: string; categoryId: number; subcategoryId?: number; frequency: string; checklistItems?: string[]; month?: number;
 }) => post(`${TODO}/templates`, data);
 export const updateTemplate = (id: number, data: {
-  title: string; notes?: string; categoryId: number; subcategoryId?: number; frequency: string; checklistItems?: string[];
+  title: string; notes?: string; categoryId: number; subcategoryId?: number; frequency: string; checklistItems?: string[]; month?: number;
 }) => put(`${TODO}/templates/${id}`, data);
 export const deleteTemplate = (id: number) => del(`${TODO}/templates/${id}`);
 
@@ -32,7 +32,12 @@ export const addTask = (templateId: number) => post(`${TODO}/tasks`, { templateI
 export const addDirectTask = (data: {
   title: string; notes?: string; categoryId: number; subcategoryId?: number; frequency: string;
 }) => post(`${TODO}/tasks/direct`, data);
+export const updateTask = (id: number, data: {
+  title: string; notes?: string; categoryId: number; subcategoryId?: number;
+}) => put(`${TODO}/tasks/${id}`, data);
 export const completeTask = (id: number) => put(`${TODO}/tasks/${id}/complete`, {});
+export const archiveTask = (id: number) => put(`${TODO}/tasks/${id}/archive`, {});
+export const archiveAllCompleted = () => put(`${TODO}/tasks/archive-completed`, {});
 export const removeTask = (id: number) => del(`${TODO}/tasks/${id}`);
 
 export const addChecklistItem = (taskId: number, text: string) =>

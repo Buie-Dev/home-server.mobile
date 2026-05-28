@@ -1,28 +1,86 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
   Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { TodoCategory, TodoTemplate } from '../../hooks/useTodo.hook';
+import { TodoCategory, TodoTemplate, Frequency } from '../../hooks/useTodo.hook';
 import { COLORS, SPACING, RADIUS } from '../../lib/theme';
 
-type Frequency = 'one_time' | 'daily' | 'weekly' | 'monthly';
-
-const FREQUENCIES: Frequency[] = ['one_time', 'daily', 'weekly', 'monthly'];
+const FREQUENCIES: Frequency[] = ['one_time', 'daily', 'weekly', 'monthly', 'quarterly', 'yearly'];
 const FREQUENCY_LABEL: Record<Frequency, string> = {
   one_time: 'One Time',
   daily: 'Daily',
   weekly: 'Weekly',
   monthly: 'Monthly',
+  quarterly: 'Quarterly',
+  yearly: 'Yearly',
 };
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+type DropdownOption<T extends string | number = number> = { label: string; value: T };
+
+function DropdownPicker<T extends string | number>({
+  label,
+  options,
+  selectedValue,
+  placeholder,
+  onSelect,
+}: {
+  label: string;
+  options: DropdownOption<T>[];
+  selectedValue: T | null;
+  placeholder: string;
+  onSelect: (value: T) => void;
+}) {
+  const [open, setOpen] = useState<boolean>(false);
+  const selected = options.find(o => o.value === selectedValue) ?? null;
+
+  return (
+    <>
+      <Text style={dropStyles.label}>{label}</Text>
+      <TouchableOpacity style={dropStyles.trigger} onPress={() => setOpen(true)}>
+        <Text style={[dropStyles.triggerText, !selected && dropStyles.placeholder]}>
+          {selected ? selected.label : placeholder}
+        </Text>
+        <Icon name="chevron-down" size={18} color={COLORS.textMuted} />
+      </TouchableOpacity>
+
+      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        <TouchableOpacity style={dropStyles.overlay} activeOpacity={1} onPress={() => setOpen(false)}>
+          <View style={dropStyles.sheet}>
+            <Text style={dropStyles.sheetTitle}>{label}</Text>
+            <FlatList
+              data={options}
+              keyExtractor={item => String(item.value)}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[dropStyles.option, item.value === selectedValue && dropStyles.optionActive]}
+                  onPress={() => { onSelect(item.value); setOpen(false); }}
+                >
+                  <Text style={[dropStyles.optionText, item.value === selectedValue && dropStyles.optionTextActive]}>
+                    {item.label}
+                  </Text>
+                  {item.value === selectedValue && (
+                    <Icon name="check" size={16} color={COLORS.primary} />
+                  )}
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </>
+  );
+}
 
 type Props = {
   visible: boolean;
   categories: TodoCategory[];
   initialTemplate?: TodoTemplate | null;
   onClose: () => void;
-  onSave: (data: { title: string; categoryId: number; subcategoryId?: number; frequency: Frequency; notes?: string; checklistItems: string[] }) => void;
+  onSave: (data: { title: string; categoryId: number; subcategoryId?: number; frequency: Frequency; notes?: string; checklistItems: string[]; month?: number }) => void;
 };
 
 function AddTemplateModal({ visible, categories, initialTemplate, onClose, onSave }: Props) {
@@ -31,6 +89,7 @@ function AddTemplateModal({ visible, categories, initialTemplate, onClose, onSav
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | null>(null);
   const [frequency, setFrequency] = useState<Frequency>('one_time');
+  const [month, setMonth] = useState<number>(1);
   const [checklistItems, setChecklistItems] = useState<string[]>([]);
   const [newChecklistText, setNewChecklistText] = useState<string>('');
   const checklistInputRef = useRef<any>(null);
@@ -42,6 +101,7 @@ function AddTemplateModal({ visible, categories, initialTemplate, onClose, onSav
       setSelectedCategoryId(initialTemplate?.categoryId ?? null);
       setSelectedSubcategoryId(initialTemplate?.subcategoryId ?? null);
       setFrequency(initialTemplate?.frequency ?? 'one_time');
+      setMonth(initialTemplate?.month ?? 1);
       setChecklistItems(initialTemplate?.checklistItems?.map(i => i.text) ?? []);
       setNewChecklistText('');
     }
@@ -50,12 +110,18 @@ function AddTemplateModal({ visible, categories, initialTemplate, onClose, onSav
   const selectedCategory = categories.find(c => c.id === selectedCategoryId) ?? null;
   const subcategories = selectedCategory?.subcategories ?? [];
 
+  const categoryOptions: DropdownOption[] = categories.map(c => ({ label: c.name, value: c.id }));
+  const subcategoryOptions: DropdownOption[] = subcategories.map(s => ({ label: s.name, value: s.id }));
+  const frequencyOptions: DropdownOption<Frequency>[] = FREQUENCIES.map(f => ({ label: FREQUENCY_LABEL[f], value: f }));
+  const monthOptions: DropdownOption<number>[] = MONTHS.map((name, i) => ({ label: name, value: i + 1 }));
+
   const reset = () => {
     setTitle('');
     setNotes('');
     setSelectedCategoryId(null);
     setSelectedSubcategoryId(null);
     setFrequency('one_time');
+    setMonth(1);
     setChecklistItems([]);
     setNewChecklistText('');
   };
@@ -97,11 +163,12 @@ function AddTemplateModal({ visible, categories, initialTemplate, onClose, onSav
       frequency,
       notes: notes.trim() || undefined,
       checklistItems,
+      month: frequency === 'yearly' ? month : undefined,
     });
     reset();
   };
 
-  const selectCategory = (id: number) => {
+  const selectCategory = (id: number | null) => {
     setSelectedCategoryId(id);
     setSelectedSubcategoryId(null);
   };
@@ -123,48 +190,41 @@ function AddTemplateModal({ visible, categories, initialTemplate, onClose, onSav
               onChangeText={setTitle}
             />
 
-            <Text style={styles.label}>Category</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={styles.chipRow}>
-              {categories.map(c => (
-                <TouchableOpacity
-                  key={c.id}
-                  style={[styles.chip, selectedCategoryId === c.id && styles.chipActive]}
-                  onPress={() => selectCategory(c.id)}
-                >
-                  <Text style={[styles.chipText, selectedCategoryId === c.id && styles.chipTextActive]}>{c.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+            <DropdownPicker
+              label="Category"
+              options={categoryOptions}
+              selectedValue={selectedCategoryId}
+              placeholder="Select a category..."
+              onSelect={selectCategory}
+            />
 
             {subcategories.length > 0 && (
-              <>
-                <Text style={styles.label}>Subcategory</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={styles.chipRow}>
-                  {subcategories.map(s => (
-                    <TouchableOpacity
-                      key={s.id}
-                      style={[styles.chip, selectedSubcategoryId === s.id && styles.chipActive]}
-                      onPress={() => setSelectedSubcategoryId(selectedSubcategoryId === s.id ? null : s.id)}
-                    >
-                      <Text style={[styles.chipText, selectedSubcategoryId === s.id && styles.chipTextActive]}>{s.name}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </>
+              <DropdownPicker
+                label="Subcategory"
+                options={subcategoryOptions}
+                selectedValue={selectedSubcategoryId}
+                placeholder="None"
+                onSelect={setSelectedSubcategoryId}
+              />
             )}
 
-            <Text style={styles.label}>Frequency</Text>
-            <View style={styles.chipRow}>
-              {FREQUENCIES.map(f => (
-                <TouchableOpacity
-                  key={f}
-                  style={[styles.chip, frequency === f && styles.chipActive]}
-                  onPress={() => setFrequency(f)}
-                >
-                  <Text style={[styles.chipText, frequency === f && styles.chipTextActive]}>{FREQUENCY_LABEL[f]}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <DropdownPicker<Frequency>
+              label="Frequency"
+              options={frequencyOptions}
+              selectedValue={frequency}
+              placeholder="Select frequency..."
+              onSelect={setFrequency}
+            />
+
+            {frequency === 'yearly' && (
+              <DropdownPicker<number>
+                label="Month"
+                options={monthOptions}
+                selectedValue={month}
+                placeholder="Select month..."
+                onSelect={setMonth}
+              />
+            )}
 
             <Text style={styles.label}>Notes (optional)</Text>
             <TextInput
@@ -199,7 +259,6 @@ function AddTemplateModal({ visible, categories, initialTemplate, onClose, onSav
                 onChangeText={setNewChecklistText}
                 onSubmitEditing={handleAddChecklistItem}
                 returnKeyType="done"
-                blurOnSubmit={false}
               />
               <TouchableOpacity
                 style={[styles.checklistAddBtn, !newChecklistText.trim() && styles.checklistAddBtnDisabled]}
@@ -227,6 +286,20 @@ function AddTemplateModal({ visible, categories, initialTemplate, onClose, onSav
 
 export default AddTemplateModal;
 
+const dropStyles = StyleSheet.create({
+  label: { fontSize: 12, fontWeight: '700', color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: SPACING.xs, marginTop: SPACING.sm },
+  trigger: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: COLORS.background, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border },
+  triggerText: { fontSize: 15, color: COLORS.textPrimary, flex: 1 },
+  placeholder: { color: COLORS.textMuted },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', paddingHorizontal: SPACING.md },
+  sheet: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, overflow: 'hidden', maxHeight: 400 },
+  sheetTitle: { fontSize: 14, fontWeight: '700', color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, padding: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  option: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, paddingHorizontal: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.divider },
+  optionActive: { backgroundColor: COLORS.primaryLight },
+  optionText: { flex: 1, fontSize: 15, color: COLORS.textPrimary },
+  optionTextActive: { color: COLORS.primary, fontWeight: '600' },
+});
+
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: COLORS.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: SPACING.md, paddingBottom: 40 },
@@ -234,12 +307,6 @@ const styles = StyleSheet.create({
   label: { fontSize: 12, fontWeight: '700', color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: SPACING.xs, marginTop: SPACING.sm },
   input: { backgroundColor: COLORS.background, borderRadius: RADIUS.md, padding: SPACING.md, fontSize: 15, color: COLORS.textPrimary, borderWidth: 1, borderColor: COLORS.border },
   notesInput: { height: 80, textAlignVertical: 'top' },
-  chipScroll: { maxHeight: 44 },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, paddingVertical: 2 },
-  chip: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs + 2, borderRadius: 999, borderWidth: 1.5, borderColor: COLORS.border, backgroundColor: COLORS.surface },
-  chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  chipText: { fontSize: 13, fontWeight: '500', color: COLORS.textSecondary },
-  chipTextActive: { color: COLORS.surface },
   checklistRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, paddingVertical: SPACING.xs + 1 },
   checklistItemText: { flex: 1, fontSize: 14, color: COLORS.textPrimary },
   checklistAddRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.xs, borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: SPACING.sm },

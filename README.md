@@ -1,97 +1,114 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# HomeApp
 
-# Getting Started
+React Native mobile app for the home automation system. Communicates with `homeserver.api` (REST) and `homewebsocket.api` (WebSocket) running on the home server.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+Two builds can be installed on the same phone simultaneously:
 
-## Step 1: Start Metro
+| Build | Bundle ID (iOS) | Display Name | Command |
+|---|---|---|---|
+| **Dev** | `org.buie.HomeApp.dev` | HomeApp Dev | `npm run ios` |
+| **Production** | `org.buie.HomeApp` | HomeApp | `npx react-native run-ios --mode Release` |
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+---
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Prerequisites
 
-```sh
-# Using npm
-npm start
+- Node.js + npm
+- Xcode (iOS)
+- Ruby + Bundler (`gem install bundler`)
+- CocoaPods (`bundle exec pod install`)
 
-# OR using Yarn
-yarn start
-```
+On first clone or after adding native dependencies:
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
+```bash
 bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
 bundle exec pod install
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
 
-```sh
-# Using npm
-npm run ios
+## Environment Setup (.env)
 
-# OR using Yarn
-yarn ios
+The `.env` file at the project root controls which server the app connects to. There are two modes:
+
+### Local / Dev (on home network)
+
+Use the home server's local IP directly. Comment out or remove `REACT_APP_NGROK_DOMAIN`:
+
+```env
+REACT_APP_SERVER="192.168.1.94"
+REACT_APP_WEBSOCKET="192.168.1.94"
+REACT_APP_API_PORT="5001"
+REACT_APP_WEB_SOCKET_PORT="8765"
+# REACT_APP_NGROK_DOMAIN="badgerly-nonmeteorologic-tonya.ngrok-free.dev"
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+The app will connect to:
+- REST API: `http://192.168.1.94:5001`
+- WebSocket: `ws://192.168.1.94:8765`
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Production / Remote (outside home network)
 
-## Step 3: Modify your app
+Set `REACT_APP_NGROK_DOMAIN` to route all traffic through ngrok. When this is set it takes priority over the IP/port values:
 
-Now that you have successfully run the app, let's make changes!
+```env
+REACT_APP_SERVER="192.168.1.94"
+REACT_APP_WEBSOCKET="192.168.1.94"
+REACT_APP_API_PORT="5001"
+REACT_APP_WEB_SOCKET_PORT="8765"
+REACT_APP_NGROK_DOMAIN="badgerly-nonmeteorologic-tonya.ngrok-free.dev"
+```
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+The app will connect to:
+- REST API: `https://badgerly-nonmeteorologic-tonya.ngrok-free.dev/api`
+- WebSocket: `wss://badgerly-nonmeteorologic-tonya.ngrok-free.dev/ws`
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+> After changing `.env`, restart Metro with `npm start` (or stop and re-run the build command) so the new values are picked up.
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+---
 
-## Congratulations! :tada:
+## Running the App
 
-You've successfully run and modified your React Native App. :partying_face:
+### Dev build (HomeApp Dev)
 
-### Now what?
+Used for day-to-day development. Supports fast refresh and the React Native debugger.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+```bash
+npm start            # start Metro bundler (separate terminal)
+npm run ios          # build debug and install on connected iPhone
+```
 
-# Troubleshooting
+### Production build (HomeApp)
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+Used when shipping a stable version to the phone. Set `.env` to the ngrok domain before building.
 
-# Learn More
+```bash
+npx react-native run-ios --mode Release
+```
 
-To learn more about React Native, take a look at the following resources:
+Takes 5–15 minutes. Does not require Metro to be running.
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+
+## Project Structure
+
+```
+api/            Axios API functions (one file per service)
+components/     Reusable UI components
+config/         config.ts — reads .env and exports base URLs
+context/        React contexts (Auth, WebSocket, Units)
+hooks/          Custom hooks that consume API files
+lib/            Shared utilities (theme, token storage, units)
+screens/        Top-level screens (Home, Login, irrigation/, todo/, megan/)
+```
+
+---
+
+## Backend Services
+
+| Service | Repo | Port |
+|---|---|---|
+| REST API | `homeserver.api` | 5001 |
+| WebSocket | `homewebsocket.api` | 8765 |
+
+Both run via Docker on the home server. Start `home-server` first (shared network + MySQL), then the other services.
