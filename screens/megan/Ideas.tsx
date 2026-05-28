@@ -194,7 +194,9 @@ function Ideas() {
 
       {/* Ideas list */}
       {loading ? (
-        <ActivityIndicator size="large" color={COLORS.primary} style={styles.loader} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
       ) : (
         <FlatList
           style={styles.list}
@@ -264,7 +266,7 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   chipText: { fontSize: 13, fontWeight: '500', color: COLORS.textSecondary },
   chipTextActive: { color: COLORS.surface },
-  loader: { marginTop: SPACING.xl },
+  loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   list: { flex: 1 },
   listContent: { padding: SPACING.md, gap: SPACING.sm, paddingBottom: SPACING.xl },
   card: { flexDirection: 'row', backgroundColor: COLORS.surface, borderRadius: RADIUS.md, overflow: 'hidden', ...SHADOWS.card },
