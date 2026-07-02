@@ -40,6 +40,10 @@ export const forceScheduleSync = async () => {
 	return await base.post(`${IRRIGATION}/schedules/sync`, {})
 }
 
+export const reorderSchedules = async (ids: number[]) => {
+	return await base.put(`${IRRIGATION}/schedules/reorder`, { ids })
+}
+
 export const healthCheck = async () => {
 	return await base.get(HEALTH_CHECK)
 }

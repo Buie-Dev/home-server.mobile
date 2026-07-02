@@ -6,4 +6,6 @@ export const HEALTH_CHECK = `${baseAPIUrl}`
 export const DEVICES = `${baseAPIUrl}/devices`
 export const AUTH = `${baseAPIUrl}/auth`
 export const MEGAN = `${baseAPIUrl}/megan`
+export const PEOPLE = `${baseAPIUrl}/people`
 export const TODO = `${baseAPIUrl}/todo`
+export const EVENTS = `${baseAPIUrl}/events`

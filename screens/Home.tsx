@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { COLORS, SHADOWS, SPACING, RADIUS } from '../lib/theme';
+import { useAuth } from '../context/AuthContext';
 import type { RootStackParamList } from '../App';
 
 type Section = {
@@ -12,6 +13,7 @@ type Section = {
   iconBg: string;
   iconColor: string;
   route: keyof RootStackParamList;
+  permission: string;
 };
 
 const SECTIONS: Section[] = [
@@ -21,13 +23,15 @@ const SECTIONS: Section[] = [
     iconBg: COLORS.primaryLight,
     iconColor: COLORS.primary,
     route: 'Irrigation',
+    permission: 'irrigation',
   },
   {
-    title: 'Megan',
-    icon: 'flower-outline',
+    title: 'People',
+    icon: 'account-group-outline',
     iconBg: '#FCE4EC',
     iconColor: '#E91E63',
-    route: 'Megan',
+    route: 'People',
+    permission: 'people',
   },
   {
     title: 'To Do',
@@ -35,17 +39,36 @@ const SECTIONS: Section[] = [
     iconBg: COLORS.warningLight,
     iconColor: COLORS.warning,
     route: 'ToDo',
+    permission: 'todo',
+  },
+  {
+    title: 'Events',
+    icon: 'calendar-star',
+    iconBg: '#F3E5F5',
+    iconColor: '#9C27B0',
+    route: 'Events',
+    permission: 'events',
+  },
+  {
+    title: 'Devices',
+    icon: 'access-point-network',
+    iconBg: '#E8EAF6',
+    iconColor: '#3F51B5',
+    route: 'Devices',
+    permission: 'devices',
   },
 ];
 
 function Home() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { hasPermission } = useAuth();
+  const visibleSections = SECTIONS.filter(s => hasPermission(s.permission));
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.heading}>HomeApp</Text>
-        {SECTIONS.map(section => (
+        {visibleSections.map(section => (
           <TouchableOpacity
             key={section.title}
             style={styles.card}

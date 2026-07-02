@@ -7,7 +7,6 @@ import Zones from '../../screens/irrigation/Zones';
 import Schedules from '../../screens/irrigation/Schedules';
 import Queue from '../../screens/irrigation/Queue';
 import History from '../../screens/irrigation/History';
-import Devices from '../../screens/irrigation/Devices';
 import useIrrigation from '../../hooks/useIrrigation.hook';
 import { COLORS } from '../../lib/theme';
 
@@ -33,7 +32,6 @@ const TAB_ICONS: Record<string, string> = {
   Schedules: 'calendar-clock',
   Live: 'play-circle-outline',
   History: 'chart-bar',
-  Devices: 'access-point-network',
 };
 
 const IrrigationPage = () => {
@@ -63,7 +61,6 @@ const IrrigationPage = () => {
             }}
           />
           <Tab.Screen name="History" component={History} />
-          <Tab.Screen name="Devices" component={Devices} />
         </Tab.Navigator>
     </SafeAreaView>
   );

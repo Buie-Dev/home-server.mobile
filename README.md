@@ -33,14 +33,14 @@ The `.env` file at the project root controls which server the app connects to. T
 
 ### Local / Dev (on home network)
 
-Use the home server's local IP directly. Comment out or remove `REACT_APP_NGROK_DOMAIN`:
+Use the home server's local IP directly. Comment out or remove `REACT_APP_DOMAIN`:
 
 ```env
 REACT_APP_SERVER="192.168.1.94"
 REACT_APP_WEBSOCKET="192.168.1.94"
 REACT_APP_API_PORT="5001"
 REACT_APP_WEB_SOCKET_PORT="8765"
-# REACT_APP_NGROK_DOMAIN="badgerly-nonmeteorologic-tonya.ngrok-free.dev"
+# REACT_APP_DOMAIN="dandelionlane.ca"
 ```
 
 The app will connect to:
@@ -49,19 +49,19 @@ The app will connect to:
 
 ### Production / Remote (outside home network)
 
-Set `REACT_APP_NGROK_DOMAIN` to route all traffic through ngrok. When this is set it takes priority over the IP/port values:
+Set `REACT_APP_DOMAIN` to route all traffic through Cloudflare. When this is set it takes priority over the IP/port values:
 
 ```env
 REACT_APP_SERVER="192.168.1.94"
 REACT_APP_WEBSOCKET="192.168.1.94"
 REACT_APP_API_PORT="5001"
 REACT_APP_WEB_SOCKET_PORT="8765"
-REACT_APP_NGROK_DOMAIN="badgerly-nonmeteorologic-tonya.ngrok-free.dev"
+REACT_APP_DOMAIN="dandelionlane.ca"
 ```
 
 The app will connect to:
-- REST API: `https://badgerly-nonmeteorologic-tonya.ngrok-free.dev/api`
-- WebSocket: `wss://badgerly-nonmeteorologic-tonya.ngrok-free.dev/ws`
+- REST API: `https://dandelionlane.ca/api`
+- WebSocket: `wss://dandelionlane.ca/ws`
 
 > After changing `.env`, restart Metro with `npm start` (or stop and re-run the build command) so the new values are picked up.
 
@@ -80,7 +80,7 @@ npm run ios          # build debug and install on connected iPhone
 
 ### Production build (HomeApp)
 
-Used when shipping a stable version to the phone. Set `.env` to the ngrok domain before building.
+Used when shipping a stable version to the phone. Set `.env` to the Cloudflare domain before building.
 
 ```bash
 npx react-native run-ios --mode Release

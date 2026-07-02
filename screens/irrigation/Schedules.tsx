@@ -1,5 +1,7 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { Alert, Text, View, StyleSheet, ScrollView, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
+import { Alert, Text, View, StyleSheet, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
+import DraggableFlatList, { RenderItemParams, ScaleDecorator } from 'react-native-draggable-flatlist';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useIrrigation, { Schedule } from '../../hooks/useIrrigation.hook';
 import CreateScheduleModal from '../../components/CreateScheduleModal/CreateScheduleModal';
@@ -21,7 +23,7 @@ const formatDaysLabel = (s: Schedule) => {
 
 function Schedules(): ReactElement {
   const [openCreate, setOpenCreate] = useState(false);
-  const { schedules, fetchSchedules, toggleSchedule, checkSync, forceSync, zoneDetails, fetchZones } = useIrrigation();
+  const { schedules, fetchSchedules, toggleSchedule, reorderSchedules, checkSync, forceSync, zoneDetails, fetchZones } = useIrrigation();
   const [selectedDelete, setSelectedDelete] = useState<Schedule>();
   const [selectedEdit, setSelectedEdit] = useState<Schedule | undefined>();
   const [syncChecking, setSyncChecking] = useState(false);
@@ -90,81 +92,96 @@ function Schedules(): ReactElement {
     setOpenCreate(false);
   };
 
-  return (
-    <View style={styles.screen}>
-      <ZoneFilterBar zoneDetails={zoneDetails} onChange={onZoneFilterChange} />
-      <ScrollView contentContainerStyle={styles.list}>
-        {schedules.map(s => (
-          <View key={s.id} style={[styles.card, !s.active && styles.cardInactive]}>
-            {/* Header row */}
-            <View style={styles.cardHeader}>
-              <View style={styles.timeBlock}>
-                <Icon name="clock-outline" size={14} color={COLORS.textSecondary} />
-                <Text style={styles.startTime}>{s.startTime}</Text>
-              </View>
-              <View style={styles.headerRight}>
-                <Switch
-                  value={!!s.active}
-                  onValueChange={v => toggleSchedule(s.id, v)}
-                  trackColor={{ false: COLORS.border, true: COLORS.primaryLight }}
-                  thumbColor={s.active ? COLORS.primary : COLORS.textMuted}
-                  style={styles.switch}
-                />
-                <TouchableOpacity onPress={() => setSelectedEdit(s)} style={styles.deleteBtn}>
-                  <Icon name="pencil-outline" size={18} color={COLORS.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setSelectedDelete(s)} style={styles.deleteBtn}>
-                  <Icon name="trash-can-outline" size={18} color={COLORS.error} />
-                </TouchableOpacity>
-              </View>
-            </View>
+  const onDragEnd = async ({ data }: { data: Schedule[] }) => {
+    await reorderSchedules(data.map(s => s.id));
+    fetchSchedules(activeZoneId, activeSubzoneId);
+  };
 
-            {/* Name */}
-            <Text style={[styles.scheduleName, !s.active && styles.textInactive]}>{s.name}</Text>
-
-            {/* Day pills */}
-            <View style={styles.dayRow}>
-              {DAYS.map((d, i) => {
-                const on = s[DAY_KEYS[i]] as boolean;
-                return (
-                  <View key={d} style={[styles.dayPill, on && styles.dayPillActive]}>
-                    <Text style={[styles.dayLetter, on && styles.dayLetterActive]}>
-                      {d[0]}
-                    </Text>
-                  </View>
-                );
-              })}
-              <Text style={styles.daysLabel}>{formatDaysLabel(s)}</Text>
-            </View>
-
-            {/* Meta */}
-            <View style={styles.metaRow}>
-              <View style={styles.metaItem}>
-                <Icon name="timer-outline" size={13} color={COLORS.textSecondary} />
-                <Text style={styles.metaText}>{s.duration} min</Text>
-              </View>
-              <View style={styles.metaItem}>
-                <Icon name="sprinkler-variant" size={13} color={COLORS.textSecondary} />
-                <Text style={styles.metaText}>{s.zoneName}</Text>
-              </View>
-              {s.subzoneNames && (
-                <View style={[styles.metaItem, styles.metaItemFlex]}>
-                  <Icon name="source-branch" size={13} color={COLORS.textSecondary} />
-                  <Text style={[styles.metaText, styles.metaTextFlex]} numberOfLines={1}>{s.subzoneNames}</Text>
-                </View>
-              )}
-            </View>
+  const renderItem = ({ item: s, drag, isActive }: RenderItemParams<Schedule>) => (
+    <ScaleDecorator>
+      <View style={[styles.card, !s.active && styles.cardInactive, isActive && styles.cardDragging]}>
+        {/* Header row */}
+        <View style={styles.cardHeader}>
+          <TouchableOpacity onLongPress={drag} style={styles.dragHandle}>
+            <Icon name="drag-horizontal-variant" size={18} color={COLORS.textMuted} />
+          </TouchableOpacity>
+          <View style={styles.timeBlock}>
+            <Icon name="clock-outline" size={14} color={COLORS.textSecondary} />
+            <Text style={styles.startTime}>{s.startTime}</Text>
           </View>
-        ))}
+          <View style={styles.headerRight}>
+            <Switch
+              value={!!s.active}
+              onValueChange={v => toggleSchedule(s.id, v)}
+              trackColor={{ false: COLORS.border, true: COLORS.primaryLight }}
+              thumbColor={s.active ? COLORS.primary : COLORS.textMuted}
+              style={styles.switch}
+            />
+            <TouchableOpacity onPress={() => setSelectedEdit(s)} style={styles.deleteBtn}>
+              <Icon name="pencil-outline" size={18} color={COLORS.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setSelectedDelete(s)} style={styles.deleteBtn}>
+              <Icon name="trash-can-outline" size={18} color={COLORS.error} />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-        {schedules.length === 0 && (
+        {/* Name */}
+        <Text style={[styles.scheduleName, !s.active && styles.textInactive]}>{s.name}</Text>
+
+        {/* Day pills */}
+        <View style={styles.dayRow}>
+          {DAYS.map((d, i) => {
+            const on = s[DAY_KEYS[i]] as boolean;
+            return (
+              <View key={d} style={[styles.dayPill, on && styles.dayPillActive]}>
+                <Text style={[styles.dayLetter, on && styles.dayLetterActive]}>
+                  {d[0]}
+                </Text>
+              </View>
+            );
+          })}
+          <Text style={styles.daysLabel}>{formatDaysLabel(s)}</Text>
+        </View>
+
+        {/* Meta */}
+        <View style={styles.metaRow}>
+          <View style={styles.metaItem}>
+            <Icon name="timer-outline" size={13} color={COLORS.textSecondary} />
+            <Text style={styles.metaText}>{s.duration} min</Text>
+          </View>
+          <View style={styles.metaItem}>
+            <Icon name="sprinkler-variant" size={13} color={COLORS.textSecondary} />
+            <Text style={styles.metaText}>{s.zoneName}</Text>
+          </View>
+          {s.subzoneNames && (
+            <View style={[styles.metaItem, styles.metaItemFlex]}>
+              <Icon name="source-branch" size={13} color={COLORS.textSecondary} />
+              <Text style={[styles.metaText, styles.metaTextFlex]} numberOfLines={1}>{s.subzoneNames}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    </ScaleDecorator>
+  );
+
+  return (
+    <GestureHandlerRootView style={styles.screen}>
+      <ZoneFilterBar zoneDetails={zoneDetails} onChange={onZoneFilterChange} />
+      <DraggableFlatList
+        data={schedules}
+        onDragEnd={onDragEnd}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
+        ListEmptyComponent={
           <View style={styles.emptyState}>
             <Icon name="calendar-clock" size={48} color={COLORS.textMuted} />
             <Text style={styles.emptyTitle}>No schedules yet</Text>
             <Text style={styles.emptySub}>Tap below to create your first schedule</Text>
           </View>
-        )}
-      </ScrollView>
+        }
+      />
 
       {/* Action row */}
       <View style={styles.actionRow}>
@@ -194,7 +211,7 @@ function Schedules(): ReactElement {
           fetchSchedules(activeZoneId, activeSubzoneId);
         }}
       />
-    </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -208,6 +225,7 @@ const styles = StyleSheet.create({
   list: {
     padding: SPACING.md,
     gap: SPACING.sm,
+    paddingBottom: SPACING.xl * 4,
   },
   card: {
     backgroundColor: COLORS.surface,
@@ -218,16 +236,26 @@ const styles = StyleSheet.create({
   cardInactive: {
     opacity: 0.6,
   },
+  cardDragging: {
+    ...SHADOWS.card,
+    shadowOpacity: 0.25,
+    elevation: 8,
+  },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.xs,
   },
+  dragHandle: {
+    padding: 4,
+    marginRight: SPACING.xs,
+  },
   timeBlock: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    flex: 1,
   },
   startTime: {
     fontSize: 13,

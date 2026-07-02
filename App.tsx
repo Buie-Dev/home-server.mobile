@@ -5,8 +5,10 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './screens/Login';
 import Home from './screens/Home';
 import IrrigationPage from './components/IrrigationPage/IrrigationPage';
-import Ideas from './screens/megan/Ideas';
+import People from './screens/megan/People';
 import ToDo from './screens/todo/ToDo';
+import DevicesScreen from './screens/irrigation/Devices';
+import Events from './screens/events/Events';
 import { WebSocketProvider } from './context/WebSocketContext';
 import { UnitProvider } from './context/UnitContext';
 import { ActivityIndicator, View } from 'react-native';
@@ -15,8 +17,10 @@ import { COLORS } from './lib/theme';
 export type RootStackParamList = {
   Home: undefined;
   Irrigation: undefined;
-  Megan: undefined;
+  People: undefined;
   ToDo: undefined;
+  Devices: undefined;
+  Events: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -43,8 +47,10 @@ const AppContent = () => {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Irrigation" component={IrrigationPage} />
-            <Stack.Screen name="Megan" component={Ideas} />
+            <Stack.Screen name="People" component={People} />
             <Stack.Screen name="ToDo" component={ToDo} />
+            <Stack.Screen name="Devices" component={DevicesScreen} />
+            <Stack.Screen name="Events" component={Events} />
           </Stack.Navigator>
         </NavigationContainer>
       </WebSocketProvider>

@@ -64,6 +64,7 @@ export type Schedule = {
 	zoneName: string;
 	zoneId: number;
 	active: boolean;
+	sortOrder: number;
 }
 
 export type CreateScheduleParams = {
@@ -107,6 +108,7 @@ interface IrrigationInfo {
 	updateSchedule: (id: number, data: CreateScheduleParams) => Promise<void>;
 	deleteSchedule: (id: number) => Promise<void>;
 	toggleSchedule: (id: number, active: boolean) => Promise<void>;
+	reorderSchedules: (ids: number[]) => Promise<void>;
 	fetchZoneTypes: () => void;
 	checkSync: () => Promise<SyncStatus | null>;
 	forceSync: () => Promise<{ synced: number } | null>;
@@ -283,6 +285,14 @@ function useIrrigation(): IrrigationInfo {
 		}
 	}
 
+	const reorderSchedules = async (ids: number[]) => {
+		try {
+			await irrigationApi.reorderSchedules(ids)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
 	const fetchZones = async (zoneTypeId?: number) => {
 		try {
 			const zones = await irrigationApi.fetchZones(zoneTypeId)
@@ -339,6 +349,7 @@ function useIrrigation(): IrrigationInfo {
 		updateSchedule,
 		fetchSchedules,
 		toggleSchedule,
+		reorderSchedules,
 		checkSync,
 		forceSync,
 		schedules,

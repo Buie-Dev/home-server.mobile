@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import {
-  View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator,
+  View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 import useDevices, { DeviceWithStatus } from '../../hooks/useDevices.hook';
 import { COLORS, SHADOWS, SPACING, RADIUS } from '../../lib/theme';
 
@@ -55,6 +56,7 @@ const DeviceCard = ({ device }: { device: DeviceWithStatus }) => {
 };
 
 function Devices() {
+  const navigation = useNavigation();
   const { devices, fetchDevices, checkConnectivity, loading } = useDevices();
 
   useEffect(() => { fetchDevices(); }, []);
@@ -63,6 +65,16 @@ function Devices() {
   const onlineCount = devices.filter(d => d.status === 'online').length;
 
   return (
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.header}>
+        <View style={styles.headerIconWrap}>
+          <Icon name="access-point-network" size={22} color={COLORS.primary} />
+        </View>
+        <Text style={styles.headerTitle}>Devices</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.homeBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Icon name="home-outline" size={24} color={COLORS.primary} />
+        </TouchableOpacity>
+      </View>
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Summary bar */}
       <View style={styles.summaryBar}>
@@ -114,12 +126,45 @@ function Devices() {
         <DeviceCard key={device.id} device={device} />
       ))}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 export default Devices;
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    gap: 12,
+  },
+  headerIconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: COLORS.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 22,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    letterSpacing: -0.3,
+  },
+  homeBtn: {
+    padding: 4,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
