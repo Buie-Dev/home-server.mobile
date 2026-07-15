@@ -9,6 +9,9 @@ import People from './screens/megan/People';
 import ToDo from './screens/todo/ToDo';
 import DevicesScreen from './screens/irrigation/Devices';
 import Events from './screens/events/Events';
+import Admin from './screens/admin/Admin';
+import Rowing from './screens/rowing/Rowing';
+import RaceTimer from './screens/rowing/RaceTimer';
 import { WebSocketProvider } from './context/WebSocketContext';
 import { UnitProvider } from './context/UnitContext';
 import { ActivityIndicator, View } from 'react-native';
@@ -21,6 +24,9 @@ export type RootStackParamList = {
   ToDo: undefined;
   Devices: undefined;
   Events: undefined;
+  Admin: undefined;
+  Rowing: undefined;
+  RaceTimer: { raceId: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -51,6 +57,9 @@ const AppContent = () => {
             <Stack.Screen name="ToDo" component={ToDo} />
             <Stack.Screen name="Devices" component={DevicesScreen} />
             <Stack.Screen name="Events" component={Events} />
+            <Stack.Screen name="Admin" component={Admin} />
+            <Stack.Screen name="Rowing" component={Rowing} />
+            <Stack.Screen name="RaceTimer" component={RaceTimer} />
           </Stack.Navigator>
         </NavigationContainer>
       </WebSocketProvider>

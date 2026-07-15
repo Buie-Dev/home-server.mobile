@@ -57,6 +57,22 @@ const SECTIONS: Section[] = [
     route: 'Devices',
     permission: 'devices',
   },
+  {
+    title: 'Rowing',
+    icon: 'rowing',
+    iconBg: '#E3F2FD',
+    iconColor: '#1565C0',
+    route: 'Rowing',
+    permission: 'rowing',
+  },
+  {
+    title: 'Admin',
+    icon: 'shield-account-outline',
+    iconBg: '#FFF3E0',
+    iconColor: '#E65100',
+    route: 'Admin',
+    permission: 'admin',
+  },
 ];
 
 function Home() {

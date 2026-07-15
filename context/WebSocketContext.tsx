@@ -9,6 +9,8 @@ export enum WEBSOCKET_TOPICS {
 	PRIORITY_QUEUE = 'priorityQueue',
 	HEALTH_CHECK_RESPONSE = 'healthcheck/response',
 	LIVE_FLOW = 'liveFlow',
+	ROWING_START = 'rowing/start',
+	ROWING_FINISH = 'rowing/finish',
 }
 
 interface MessagePayload {
@@ -22,6 +24,8 @@ interface WebSocketContextType {
 	latestCurrentQueueStates: Array<CurrentQueueState>;
 	latestHealthCheckResponses: Array<HealthCheckResponse>;
 	liveFlow: LiveFlowState | null;
+  latestRowingStartEvent: RowingStartEvent | null;
+  latestRowingFinishEvent: RowingFinishEvent | null;
   isConnected: boolean;
 }
 
@@ -51,6 +55,8 @@ export type LiveFlowState = {
 	litres: number;
 }
 
+export type RowingStartEvent = { raceId: number; entryId: number; boatName: string; timestamp: number };
+export type RowingFinishEvent = { raceId: number; entryId: number; boatName: string; timestamp: number; elapsedMs: number };
 
 // ✅ Create Context with Type
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -61,6 +67,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 	const [latestCurrentQueueStates, setLatestCurrentQueueStates] = useState<Array<CurrentQueueState>>([])
 	const [latestHealthCheckResponses, setLatestHealthCheckResponses] = useState<Array<HealthCheckResponse>>([])
 	const [liveFlow, setLiveFlow] = useState<LiveFlowState | null>(null);
+  const [latestRowingStartEvent, setLatestRowingStartEvent] = useState<RowingStartEvent | null>(null);
+  const [latestRowingFinishEvent, setLatestRowingFinishEvent] = useState<RowingFinishEvent | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
 	useEffect(() => {
@@ -101,6 +109,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 						break;
 					case WEBSOCKET_TOPICS.LIVE_FLOW:
 						setLiveFlow(JSON.parse(content.message) as LiveFlowState);
+						break;
+					case WEBSOCKET_TOPICS.ROWING_START:
+						setLatestRowingStartEvent(JSON.parse(content.message) as RowingStartEvent);
+						break;
+					case WEBSOCKET_TOPICS.ROWING_FINISH:
+						setLatestRowingFinishEvent(JSON.parse(content.message) as RowingFinishEvent);
 						break;
 					default:
 						console.log("Topic not handled:", content.topic);
@@ -148,7 +162,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage, isConnected, latestCurrentQueueStates, latestCurrentStates, latestHealthCheckResponses, liveFlow }}>
+    <WebSocketContext.Provider value={{ sendMessage, isConnected, latestCurrentQueueStates, latestCurrentStates, latestHealthCheckResponses, liveFlow, latestRowingStartEvent, latestRowingFinishEvent }}>
       {children}
     </WebSocketContext.Provider>
   );

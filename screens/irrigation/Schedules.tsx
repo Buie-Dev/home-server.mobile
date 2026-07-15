@@ -173,6 +173,7 @@ function Schedules(): ReactElement {
         onDragEnd={onDragEnd}
         keyExtractor={item => item.id.toString()}
         renderItem={renderItem}
+        style={styles.list_flex}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -221,6 +222,9 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  list_flex: {
+    flex: 1,
   },
   list: {
     padding: SPACING.md,

@@ -1,5 +1,5 @@
-import { get, post } from './base.api';
-import { AUTH } from './apiRoutes';
+import { get, post, put, del } from './base.api';
+import { AUTH, ADMIN } from './apiRoutes';
 
 interface LoginResponse {
   token: string;
@@ -12,3 +12,15 @@ export const loginRequest = (username: string, password: string): Promise<LoginR
 
 export const fetchMyPermissions = (): Promise<{ pages: string[] }> =>
   get<{ pages: string[] }>(`${AUTH}/me/permissions`);
+
+export const fetchAllUsers = (): Promise<{ id: number; username: string; permissions: Record<string, boolean> }[]> =>
+  get(`${ADMIN}/users`);
+
+export const setUserPermissions = (userId: number, permissions: Record<string, boolean>): Promise<void> =>
+  put(`${ADMIN}/users/${userId}/permissions`, permissions);
+
+export const createUser = ({ username, password }: { username: string; password: string }): Promise<{ id: number; username: string }> =>
+  post(`${ADMIN}/users`, { username, password });
+
+export const deleteUser = ({ userId }: { userId: number }): Promise<void> =>
+  del(`${ADMIN}/users/${userId}`);
