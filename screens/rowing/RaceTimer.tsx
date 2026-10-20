@@ -96,6 +96,7 @@ type EntryCardProps = {
   onFinish: ({ entry }: { entry: RaceEntry }) => void;
   onDns: ({ entry }: { entry: RaceEntry }) => void;
   onDnf: ({ entry }: { entry: RaceEntry }) => void;
+  onRemove: ({ entry }: { entry: RaceEntry }) => void;
 };
 
 function EntryCard({
@@ -108,6 +109,7 @@ function EntryCard({
   onFinish,
   onDns,
   onDnf,
+  onRemove,
 }: EntryCardProps): ReactElement {
   const effectiveStartTime = liveStartTime ?? entry.startTime;
   const isOnCourse = effectiveStartTime !== null && effectiveStartTime !== undefined && !entry.finishTime && !entry.dns && !entry.dnf;
@@ -197,6 +199,14 @@ function EntryCard({
           )}
         </View>
       )}
+
+      <TouchableOpacity
+        style={styles.removeEntryBtn}
+        onPress={() => onRemove({ entry })}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <Icon name="close" size={18} color={COLORS.textMuted} />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -210,18 +220,17 @@ function RaceTimer(): ReactElement {
   const {
     activeRace,
     loadRace,
-    openRace,
     finishRace,
     sendBoatStart,
     sendBoatFinish,
     setEntryDns,
     setEntryDnf,
+    removeEntry,
   } = useRowing();
 
   const [role, setRole] = useState<Role>('observer');
   const [rankBy, setRankBy] = useState<'time' | 'wbt'>('wbt');
   const [liveStarts, setLiveStarts] = useState<Record<number, number>>({});
-  const [isActivating, setIsActivating] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const orderRef = useRef<number[] | null>(null);
 
@@ -288,17 +297,6 @@ function RaceTimer(): ReactElement {
       (e) => (e.elapsedMs !== null) || e.dns || e.dnf,
     );
   }, [race]);
-
-  const handleActivate = useCallback(async () => {
-    setIsActivating(true);
-    try {
-      await openRace({ id: raceId });
-    } catch {
-      Alert.alert('Error', 'Failed to activate race.');
-    } finally {
-      setIsActivating(false);
-    }
-  }, [openRace, raceId]);
 
   const handleStartAll = useCallback(async () => {
     if (!race) return;
@@ -427,6 +425,27 @@ function RaceTimer(): ReactElement {
     );
   }, [finishRace, raceId]);
 
+  const handleRemoveEntry = useCallback(({ entry }: { entry: RaceEntry }) => {
+    Alert.alert(
+      'Remove Entry',
+      `Remove ${entry.boatName} from this race?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await removeEntry({ entryId: entry.id });
+            } catch {
+              Alert.alert('Error', 'Failed to remove entry.');
+            }
+          },
+        },
+      ],
+    );
+  }, [removeEntry]);
+
   if (!race) {
     return (
       <SafeAreaView style={styles.safe}>
@@ -452,9 +471,8 @@ function RaceTimer(): ReactElement {
   const typeLabel = raceTypeBadgeLabel({ raceType: race.raceType });
   const isSideBySide = race.raceType === 'side_by_side';
 
-  const showActivate = race.status === 'pending' && role === 'start';
-  const showStartAll = race.status === 'active' && isSideBySide && role === 'start' && !allStarted;
-  const showComplete = race.status === 'active' && allDone;
+  const showStartAll = race.status !== 'completed' && isSideBySide && role === 'start' && !allStarted;
+  const showComplete = race.status !== 'completed' && allDone;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -496,25 +514,8 @@ function RaceTimer(): ReactElement {
         </View>
       )}
 
-      {(showActivate || showStartAll || showComplete) && (
+      {(showStartAll || showComplete) && (
         <View style={styles.actionBar}>
-          {showActivate && (
-            <TouchableOpacity
-              style={styles.activateBtn}
-              onPress={handleActivate}
-              disabled={isActivating}
-            >
-              {isActivating
-                ? <ActivityIndicator size="small" color={COLORS.surface} />
-                : (
-                  <>
-                    <Icon name="play-circle-outline" size={18} color={COLORS.surface} />
-                    <Text style={styles.activateBtnText}>Activate Race</Text>
-                  </>
-                )
-              }
-            </TouchableOpacity>
-          )}
           {showStartAll && (
             <TouchableOpacity
               style={styles.startAllBtn}
@@ -583,6 +584,7 @@ function RaceTimer(): ReactElement {
                   onFinish={handleFinish}
                   onDns={handleDns}
                   onDnf={handleDnf}
+                  onRemove={handleRemoveEntry}
                 />
               ))}
             </>
@@ -737,7 +739,14 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     gap: SPACING.sm,
+    position: 'relative' as const,
     ...SHADOWS.card,
+  },
+  removeEntryBtn: {
+    position: 'absolute' as const,
+    top: SPACING.xs,
+    right: SPACING.xs,
+    padding: SPACING.xs,
   },
   entryCardHeader: {
     flexDirection: 'row',

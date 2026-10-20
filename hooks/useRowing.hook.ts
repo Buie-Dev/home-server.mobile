@@ -3,8 +3,8 @@ import {
   fetchBoatClasses, fetchCrewMembers, createCrewMember, deleteCrewMember,
   fetchBoats, createBoat, deleteBoat,
   fetchCrews, createCrew, updateCrew, updateCrewLineup, deleteCrew,
-  fetchRaces, fetchRace, createRace, activateRace, completeRace, deleteRace,
-  recordEntryStart, recordEntryFinish, markEntryDns, markEntryDnf,
+  fetchRaces, fetchRace, createRace, completeRace, deleteRace,
+  recordEntryStart, recordEntryFinish, markEntryDns, markEntryDnf, deleteEntry,
 } from '../api/rowing.api';
 import type { BoatClass, Boat, Crew, CrewMember, CrewSeats, Race, RaceType, Gender, AgeCategory } from '../api/rowing.api';
 import { useWebSocket, WEBSOCKET_TOPICS } from '../context/WebSocketContext';
@@ -33,13 +33,13 @@ type UseRowingReturn = {
   fetchAllRaces: ({ date }: { date: string }) => Promise<void>;
   loadRace: ({ id }: { id: number }) => Promise<void>;
   startRace: ({ distance, raceType, crewIds, windConditions, notes }: { distance: string; raceType: RaceType; crewIds: number[]; windConditions?: string; notes?: string }) => Promise<number>;
-  openRace: ({ id }: { id: number }) => Promise<void>;
   finishRace: ({ id }: { id: number }) => Promise<void>;
   removeRace: ({ id, date }: { id: number; date: string }) => Promise<void>;
   sendBoatStart: ({ raceId, entryId, boatName, timestamp }: { raceId: number; entryId: number; boatName: string; timestamp: number }) => Promise<void>;
   sendBoatFinish: ({ raceId, entryId, boatName, timestamp, elapsedMs }: { raceId: number; entryId: number; boatName: string; timestamp: number; elapsedMs: number }) => Promise<void>;
   setEntryDns: ({ entryId }: { entryId: number }) => Promise<void>;
   setEntryDnf: ({ entryId }: { entryId: number }) => Promise<void>;
+  removeEntry: ({ entryId }: { entryId: number }) => Promise<void>;
 };
 
 export function useRowing(): UseRowingReturn {
@@ -127,11 +127,6 @@ export function useRowing(): UseRowingReturn {
     return id;
   }, []);
 
-  const openRace = useCallback(async ({ id }: { id: number }) => {
-    await activateRace({ id });
-    await loadRace({ id });
-  }, [loadRace]);
-
   const finishRace = useCallback(async ({ id }: { id: number }) => {
     await completeRace({ id });
     await loadRace({ id });
@@ -164,12 +159,17 @@ export function useRowing(): UseRowingReturn {
     if (activeRace) await loadRace({ id: activeRace.id });
   }, [activeRace, loadRace]);
 
+  const removeEntry = useCallback(async ({ entryId }: { entryId: number }) => {
+    await deleteEntry({ entryId });
+    if (activeRace) await loadRace({ id: activeRace.id });
+  }, [activeRace, loadRace]);
+
   return {
     boatClasses, crewMembers, boats, crews, races, activeRace, isLoading, error,
     fetchAllBoatClasses, fetchAllCrew, addCrewMember, removeCrewMember,
     fetchAllBoats, addBoat, removeBoat,
     fetchAllCrews, addCrew, editCrew, editCrewLineup, removeCrew,
-    fetchAllRaces, loadRace, startRace, openRace, finishRace, removeRace,
-    sendBoatStart, sendBoatFinish, setEntryDns, setEntryDnf,
+    fetchAllRaces, loadRace, startRace, finishRace, removeRace,
+    sendBoatStart, sendBoatFinish, setEntryDns, setEntryDnf, removeEntry,
   };
 }

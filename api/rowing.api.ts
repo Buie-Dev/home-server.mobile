@@ -151,9 +151,6 @@ export const fetchRace = ({ id }: { id: number }): Promise<Race> =>
 export const createRace = ({ distance, raceType, crewIds, windConditions, notes }: { distance: string; raceType: RaceType; crewIds: number[]; windConditions?: string; notes?: string }): Promise<{ id: number }> =>
   post(`${ROWING}/races`, { distance, raceType, crewIds, windConditions, notes });
 
-export const activateRace = ({ id }: { id: number }): Promise<{ success: boolean }> =>
-  post(`${ROWING}/races/${id}/activate`);
-
 export const completeRace = ({ id }: { id: number }): Promise<{ success: boolean }> =>
   post(`${ROWING}/races/${id}/complete`);
 
@@ -171,4 +168,7 @@ export const markEntryDns = ({ entryId }: { entryId: number }): Promise<{ succes
 
 export const markEntryDnf = ({ entryId }: { entryId: number }): Promise<{ success: boolean }> =>
   post(`${ROWING}/entries/${entryId}/dnf`);
+
+export const deleteEntry = ({ entryId }: { entryId: number }): Promise<{ success: boolean }> =>
+  del(`${ROWING}/entries/${entryId}`);
 

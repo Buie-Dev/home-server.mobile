@@ -10,8 +10,8 @@ export const loginRequest = (username: string, password: string): Promise<LoginR
   return post<LoginResponse>(`${AUTH}/login`, { username, password });
 };
 
-export const fetchMyPermissions = (): Promise<{ pages: string[] }> =>
-  get<{ pages: string[] }>(`${AUTH}/me/permissions`);
+export const fetchMyPermissions = (): Promise<{ user_id: number; pages: string[] }> =>
+  get<{ user_id: number; pages: string[] }>(`${AUTH}/me/permissions`);
 
 export const fetchAllUsers = (): Promise<{ id: number; username: string; permissions: Record<string, boolean> }[]> =>
   get(`${ADMIN}/users`);

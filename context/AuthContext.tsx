@@ -6,6 +6,7 @@ import { clearToken, getToken, setToken } from '../lib/tokenStorage';
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
+  userId: number | null;
   permissions: string[];
   hasPermission: (page: string) => boolean;
   login: (username: string, password: string) => Promise<void>;
@@ -17,17 +18,20 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<number | null>(null);
   const [permissions, setPermissions] = useState<string[]>([]);
 
   const logout = async () => {
     await clearToken();
     setIsAuthenticated(false);
+    setUserId(null);
     setPermissions([]);
   };
 
   const loadPermissions = async (): Promise<void> => {
     try {
       const result = await fetchMyPermissions();
+      setUserId(result.user_id);
       setPermissions(result.pages);
     } catch {
       setPermissions([]);
@@ -56,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const hasPermission = (page: string): boolean => permissions.includes(page);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, permissions, hasPermission, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, userId, permissions, hasPermission, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
