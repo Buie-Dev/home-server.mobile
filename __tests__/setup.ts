@@ -26,7 +26,7 @@ jest.mock('react-native-reanimated', () =>
 );
 
 jest.mock('react-native-draggable-flatlist', () => {
-  const { FlatList } = require('react-native');
+  const {FlatList} = require('react-native');
   return {
     __esModule: true,
     default: FlatList,

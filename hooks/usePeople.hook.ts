@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import * as peopleApi from '../api/people.api';
 
 export type TrackedPerson = {
@@ -46,29 +46,41 @@ function usePeople() {
     }
   };
 
-  const addPerson = async ({ name }: { name: string }) => {
-    await peopleApi.createPerson({ name });
+  const addPerson = async ({name}: {name: string}) => {
+    await peopleApi.createPerson({name});
     await fetchPeople();
   };
 
-  const deletePerson = async ({ personId }: { personId: number }) => {
-    await peopleApi.deletePerson({ personId });
+  const deletePerson = async ({personId}: {personId: number}) => {
+    await peopleApi.deletePerson({personId});
     await fetchPeople();
   };
 
-  const fetchCategories = async ({ personId }: { personId: number }) => {
+  const fetchCategories = async ({personId}: {personId: number}) => {
     try {
-      const data = await peopleApi.fetchCategories({ personId });
+      const data = await peopleApi.fetchCategories({personId});
       setCategories(data as PersonCategory[]);
     } catch (e) {
       console.error('fetchCategories', e);
     }
   };
 
-  const fetchIdeas = async ({ personId, categoryId, subcategoryId }: { personId: number; categoryId?: number; subcategoryId?: number }) => {
+  const fetchIdeas = async ({
+    personId,
+    categoryId,
+    subcategoryId,
+  }: {
+    personId: number;
+    categoryId?: number;
+    subcategoryId?: number;
+  }) => {
     setLoading(true);
     try {
-      const data = await peopleApi.fetchIdeas({ personId, categoryId, subcategoryId });
+      const data = await peopleApi.fetchIdeas({
+        personId,
+        categoryId,
+        subcategoryId,
+      });
       setIdeas(data as PersonIdea[]);
     } catch (e) {
       console.error('fetchIdeas', e);
@@ -77,46 +89,129 @@ function usePeople() {
     }
   };
 
-  const createCategory = async ({ personId, name, subcategoryNames }: { personId: number; name: string; subcategoryNames: string[] }) => {
-    await peopleApi.createCategory({ personId, name, subcategoryNames });
-    await fetchCategories({ personId });
+  const createCategory = async ({
+    personId,
+    name,
+    subcategoryNames,
+  }: {
+    personId: number;
+    name: string;
+    subcategoryNames: string[];
+  }) => {
+    await peopleApi.createCategory({personId, name, subcategoryNames});
+    await fetchCategories({personId});
   };
 
-  const createSubcategory = async ({ personId, categoryId, name }: { personId: number; categoryId: number; name: string }) => {
-    await peopleApi.createSubcategory({ personId, categoryId, name });
-    await fetchCategories({ personId });
+  const createSubcategory = async ({
+    personId,
+    categoryId,
+    name,
+  }: {
+    personId: number;
+    categoryId: number;
+    name: string;
+  }) => {
+    await peopleApi.createSubcategory({personId, categoryId, name});
+    await fetchCategories({personId});
   };
 
-  const updateCategory = async ({ personId, id, name }: { personId: number; id: number; name: string }) => {
-    await peopleApi.updateCategory({ personId, id, name });
-    await fetchCategories({ personId });
+  const updateCategory = async ({
+    personId,
+    id,
+    name,
+  }: {
+    personId: number;
+    id: number;
+    name: string;
+  }) => {
+    await peopleApi.updateCategory({personId, id, name});
+    await fetchCategories({personId});
   };
 
-  const updateSubcategory = async ({ personId, id, name }: { personId: number; id: number; name: string }) => {
-    await peopleApi.updateSubcategory({ personId, id, name });
-    await fetchCategories({ personId });
+  const updateSubcategory = async ({
+    personId,
+    id,
+    name,
+  }: {
+    personId: number;
+    id: number;
+    name: string;
+  }) => {
+    await peopleApi.updateSubcategory({personId, id, name});
+    await fetchCategories({personId});
   };
 
-  const deleteSubcategory = async ({ personId, id }: { personId: number; id: number }) => {
-    await peopleApi.deleteSubcategory({ personId, id });
-    await fetchCategories({ personId });
+  const deleteSubcategory = async ({
+    personId,
+    id,
+  }: {
+    personId: number;
+    id: number;
+  }) => {
+    await peopleApi.deleteSubcategory({personId, id});
+    await fetchCategories({personId});
   };
 
-  const deleteCategory = async ({ personId, id }: { personId: number; id: number }) => {
-    await peopleApi.deleteCategory({ personId, id });
-    await fetchCategories({ personId });
+  const deleteCategory = async ({
+    personId,
+    id,
+  }: {
+    personId: number;
+    id: number;
+  }) => {
+    await peopleApi.deleteCategory({personId, id});
+    await fetchCategories({personId});
   };
 
-  const createIdea = async ({ personId, title, categoryId, subcategoryId, notes }: { personId: number; title: string; categoryId: number; subcategoryId?: number; notes?: string }) => {
-    await peopleApi.createIdea({ personId, title, categoryId, subcategoryId, notes });
+  const createIdea = async ({
+    personId,
+    title,
+    categoryId,
+    subcategoryId,
+    notes,
+  }: {
+    personId: number;
+    title: string;
+    categoryId: number;
+    subcategoryId?: number;
+    notes?: string;
+  }) => {
+    await peopleApi.createIdea({
+      personId,
+      title,
+      categoryId,
+      subcategoryId,
+      notes,
+    });
   };
 
-  const updateIdea = async ({ personId, id, title, categoryId, subcategoryId, notes }: { personId: number; id: number; title: string; categoryId: number; subcategoryId?: number; notes?: string }) => {
-    await peopleApi.updateIdea({ personId, id, title, categoryId, subcategoryId, notes });
+  const updateIdea = async ({
+    personId,
+    id,
+    title,
+    categoryId,
+    subcategoryId,
+    notes,
+  }: {
+    personId: number;
+    id: number;
+    title: string;
+    categoryId: number;
+    subcategoryId?: number;
+    notes?: string;
+  }) => {
+    await peopleApi.updateIdea({
+      personId,
+      id,
+      title,
+      categoryId,
+      subcategoryId,
+      notes,
+    });
   };
 
-  const deleteIdea = async ({ personId, id }: { personId: number; id: number }) => {
-    await peopleApi.deleteIdea({ personId, id });
+  const deleteIdea = async ({personId, id}: {personId: number; id: number}) => {
+    await peopleApi.deleteIdea({personId, id});
     setIdeas(prev => prev.filter(i => i.id !== id));
   };
 

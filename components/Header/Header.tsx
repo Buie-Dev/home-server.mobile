@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {View, TouchableOpacity, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { DrawerNavigation } from '../../types/navigation';
+import {DrawerNavigation} from '../../types/navigation';
 
 const Header = () => {
   const navigation = useNavigation<DrawerNavigation>();
@@ -11,8 +11,7 @@ const Header = () => {
     <View style={styles.header}>
       <TouchableOpacity
         onPress={() => navigation.toggleDrawer()}
-        style={styles.menuButton}
-      >
+        style={styles.menuButton}>
         <Icon name="menu" size={24} color="#000" />
       </TouchableOpacity>
     </View>
@@ -34,4 +33,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Header; 
+export default Header;

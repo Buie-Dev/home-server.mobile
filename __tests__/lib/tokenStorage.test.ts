@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getToken, setToken, clearToken } from '../../lib/tokenStorage';
+import {getToken, setToken, clearToken} from '../../lib/tokenStorage';
 
 beforeEach(() => {
   jest.clearAllMocks();

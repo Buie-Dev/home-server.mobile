@@ -1,4 +1,10 @@
-import React, { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,10 +18,10 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useRowing } from '../../hooks/useRowing.hook';
-import { COLORS, SHADOWS, SPACING, RADIUS } from '../../lib/theme';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useRowing} from '../../hooks/useRowing.hook';
+import {COLORS, SHADOWS, SPACING, RADIUS} from '../../lib/theme';
 import type {
   Boat,
   BoatClass,
@@ -30,7 +36,7 @@ import type {
 
 type RootStackParamList = {
   Rowing: undefined;
-  RaceTimer: { raceId: number };
+  RaceTimer: {raceId: number};
 };
 
 type RowingNavProp = NativeStackNavigationProp<RootStackParamList, 'Rowing'>;
@@ -43,52 +49,65 @@ function getTodayStr(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function addDays({ dateStr, delta }: { dateStr: string; delta: number }): string {
+function addDays({dateStr, delta}: {dateStr: string; delta: number}): string {
   const d = new Date(dateStr + 'T12:00:00');
   d.setDate(d.getDate() + delta);
   return d.toISOString().slice(0, 10);
 }
 
-function formatDateLabel({ dateStr }: { dateStr: string }): string {
+function formatDateLabel({dateStr}: {dateStr: string}): string {
   const today = getTodayStr();
   if (dateStr === today) return 'Today';
   const d = new Date(dateStr + 'T12:00:00');
-  return d.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
+  return d.toLocaleDateString('en-CA', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
-function raceTypeBadgeColor({ raceType }: { raceType: RaceType }): string {
+function raceTypeBadgeColor({raceType}: {raceType: RaceType}): string {
   return raceType === 'time_trial' ? COLORS.primary : COLORS.warning;
 }
 
-function raceTypeBadgeLabel({ raceType }: { raceType: RaceType }): string {
+function raceTypeBadgeLabel({raceType}: {raceType: RaceType}): string {
   return raceType === 'time_trial' ? 'Time Trial' : 'Side by Side';
 }
 
-function statusBadgeColor({ status }: { status: string }): string {
+function statusBadgeColor({status}: {status: string}): string {
   if (status === 'active') return COLORS.success;
   if (status === 'completed') return COLORS.textMuted;
   return COLORS.warning;
 }
 
-function statusBadgeLabel({ status }: { status: string }): string {
+function statusBadgeLabel({status}: {status: string}): string {
   if (status === 'active') return 'Active';
   if (status === 'completed') return 'Completed';
   return 'Pending';
 }
 
-function formatElapsedMs({ ms }: { ms: number }): string {
+function formatElapsedMs({ms}: {ms: number}): string {
   const totalSec = Math.floor(ms / 10);
   const cs = ms % 100;
   const secs = Math.floor(totalSec / 100) % 60;
   const mins = Math.floor(totalSec / 6000);
-  return `${mins}:${String(secs).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+  return `${mins}:${String(secs).padStart(2, '0')}.${String(cs).padStart(
+    2,
+    '0',
+  )}`;
 }
 
 type CreateRaceModalProps = {
   visible: boolean;
   crews: Crew[];
   onClose: () => void;
-  onSubmit: ({ distance, raceType, crewIds, windConditions, notes }: {
+  onSubmit: ({
+    distance,
+    raceType,
+    crewIds,
+    windConditions,
+    notes,
+  }: {
     distance: string;
     raceType: RaceType;
     crewIds: number[];
@@ -97,7 +116,12 @@ type CreateRaceModalProps = {
   }) => Promise<void>;
 };
 
-function CreateRaceModal({ visible, crews, onClose, onSubmit }: CreateRaceModalProps): ReactElement {
+function CreateRaceModal({
+  visible,
+  crews,
+  onClose,
+  onSubmit,
+}: CreateRaceModalProps): ReactElement {
   const [distance, setDistance] = useState('');
   const [raceType, setRaceType] = useState<RaceType>('time_trial');
   const [selectedCrewIds, setSelectedCrewIds] = useState<number[]>([]);
@@ -118,9 +142,9 @@ function CreateRaceModal({ visible, crews, onClose, onSubmit }: CreateRaceModalP
     onClose();
   }, [reset, onClose]);
 
-  const toggleCrew = useCallback(({ id }: { id: number }) => {
-    setSelectedCrewIds((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
+  const toggleCrew = useCallback(({id}: {id: number}) => {
+    setSelectedCrewIds(prev =>
+      prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id],
     );
   }, []);
 
@@ -151,8 +175,15 @@ function CreateRaceModal({ visible, crews, onClose, onSubmit }: CreateRaceModalP
   }, [distance, raceType, selectedCrewIds, wind, notes, onSubmit, reset]);
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={handleClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}>
+      <TouchableOpacity
+        style={styles.overlay}
+        activeOpacity={1}
+        onPress={handleClose}>
         <TouchableOpacity style={styles.modal} activeOpacity={1}>
           <Text style={styles.modalTitle}>New Race</Text>
 
@@ -167,18 +198,30 @@ function CreateRaceModal({ visible, crews, onClose, onSubmit }: CreateRaceModalP
 
           <View style={styles.toggleRow}>
             <TouchableOpacity
-              style={[styles.toggleBtn, raceType === 'time_trial' && styles.toggleBtnActive]}
-              onPress={() => setRaceType('time_trial')}
-            >
-              <Text style={[styles.toggleBtnText, raceType === 'time_trial' && styles.toggleBtnTextActive]}>
+              style={[
+                styles.toggleBtn,
+                raceType === 'time_trial' && styles.toggleBtnActive,
+              ]}
+              onPress={() => setRaceType('time_trial')}>
+              <Text
+                style={[
+                  styles.toggleBtnText,
+                  raceType === 'time_trial' && styles.toggleBtnTextActive,
+                ]}>
                 Time Trial
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.toggleBtn, raceType === 'side_by_side' && styles.toggleBtnActive]}
-              onPress={() => setRaceType('side_by_side')}
-            >
-              <Text style={[styles.toggleBtnText, raceType === 'side_by_side' && styles.toggleBtnTextActive]}>
+              style={[
+                styles.toggleBtn,
+                raceType === 'side_by_side' && styles.toggleBtnActive,
+              ]}
+              onPress={() => setRaceType('side_by_side')}>
+              <Text
+                style={[
+                  styles.toggleBtnText,
+                  raceType === 'side_by_side' && styles.toggleBtnTextActive,
+                ]}>
                 Side by Side
               </Text>
             </TouchableOpacity>
@@ -186,30 +229,38 @@ function CreateRaceModal({ visible, crews, onClose, onSubmit }: CreateRaceModalP
 
           <Text style={styles.sectionLabel}>Select Crews</Text>
           <ScrollView style={styles.crewList} nestedScrollEnabled>
-            {crews.map((crew) => {
+            {crews.map(crew => {
               const selected = selectedCrewIds.includes(crew.id);
               return (
                 <TouchableOpacity
                   key={crew.id}
-                  style={[styles.crewCheckRow, selected && styles.crewCheckRowSelected]}
-                  onPress={() => toggleCrew({ id: crew.id })}
-                >
+                  style={[
+                    styles.crewCheckRow,
+                    selected && styles.crewCheckRowSelected,
+                  ]}
+                  onPress={() => toggleCrew({id: crew.id})}>
                   <Icon
-                    name={selected ? 'checkbox-marked' : 'checkbox-blank-outline'}
+                    name={
+                      selected ? 'checkbox-marked' : 'checkbox-blank-outline'
+                    }
                     size={20}
                     color={selected ? COLORS.primary : COLORS.textMuted}
                   />
                   <View style={styles.crewCheckInfo}>
                     <Text style={styles.crewCheckName}>{crew.boatName}</Text>
                     {crew.crewClassName ? (
-                      <Text style={styles.crewCheckSub}>{crew.crewClassName}</Text>
+                      <Text style={styles.crewCheckSub}>
+                        {crew.crewClassName}
+                      </Text>
                     ) : null}
                   </View>
                 </TouchableOpacity>
               );
             })}
             {crews.length === 0 && (
-              <Text style={styles.emptyNote}>No crews available. Create a crew first.</Text>
+              <Text style={styles.emptyNote}>
+                No crews available. Create a crew first.
+              </Text>
             )}
           </ScrollView>
 
@@ -235,14 +286,17 @@ function CreateRaceModal({ visible, crews, onClose, onSubmit }: CreateRaceModalP
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.createBtn, (submitting || !distance.trim()) && styles.createBtnDisabled]}
+              style={[
+                styles.createBtn,
+                (submitting || !distance.trim()) && styles.createBtnDisabled,
+              ]}
               onPress={handleSubmit}
-              disabled={submitting || !distance.trim()}
-            >
-              {submitting
-                ? <ActivityIndicator size="small" color={COLORS.surface} />
-                : <Text style={styles.createBtnText}>Create</Text>
-              }
+              disabled={submitting || !distance.trim()}>
+              {submitting ? (
+                <ActivityIndicator size="small" color={COLORS.surface} />
+              ) : (
+                <Text style={styles.createBtnText}>Create</Text>
+              )}
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -258,7 +312,12 @@ type CrewModalProps = {
   crewMembers: CrewMember[];
   editingCrew: Crew | null;
   onClose: () => void;
-  onSubmit: ({ boatId, gender, ageCategory, seats }: {
+  onSubmit: ({
+    boatId,
+    gender,
+    ageCategory,
+    seats,
+  }: {
     boatId: number;
     gender: Gender;
     ageCategory: AgeCategory;
@@ -268,9 +327,25 @@ type CrewModalProps = {
 
 type SeatKey = keyof CrewSeats;
 
-const ALL_SEAT_KEYS: SeatKey[] = ['cox', 'seat1', 'seat2', 'seat3', 'seat4', 'seat5', 'seat6', 'seat7', 'seat8'];
+const ALL_SEAT_KEYS: SeatKey[] = [
+  'cox',
+  'seat1',
+  'seat2',
+  'seat3',
+  'seat4',
+  'seat5',
+  'seat6',
+  'seat7',
+  'seat8',
+];
 
-function seatLabel({ key, crewCount }: { key: SeatKey; crewCount: number }): string {
+function seatLabel({
+  key,
+  crewCount,
+}: {
+  key: SeatKey;
+  crewCount: number;
+}): string {
   if (key === 'cox') return 'Cox';
   const num = parseInt(key.replace('seat', ''), 10);
   if (num === 1) return 'Stroke';
@@ -278,13 +353,28 @@ function seatLabel({ key, crewCount }: { key: SeatKey; crewCount: number }): str
   return `Seat ${num}`;
 }
 
-function CrewModal({ visible, boats, boatClasses, crewMembers, editingCrew, onClose, onSubmit }: CrewModalProps): ReactElement {
+function CrewModal({
+  visible,
+  boats,
+  boatClasses,
+  crewMembers,
+  editingCrew,
+  onClose,
+  onSubmit,
+}: CrewModalProps): ReactElement {
   const [boatId, setBoatId] = useState<number | null>(null);
   const [gender, setGender] = useState<Gender>('Mixed');
   const [ageCategory, setAgeCategory] = useState<AgeCategory>('Open');
   const [seats, setSeats] = useState<CrewSeats>({
-    cox: null, seat1: null, seat2: null, seat3: null, seat4: null,
-    seat5: null, seat6: null, seat7: null, seat8: null,
+    cox: null,
+    seat1: null,
+    seat2: null,
+    seat3: null,
+    seat4: null,
+    seat5: null,
+    seat6: null,
+    seat7: null,
+    seat8: null,
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -308,26 +398,39 @@ function CrewModal({ visible, boats, boatClasses, crewMembers, editingCrew, onCl
       setBoatId(null);
       setGender('Mixed');
       setAgeCategory('Open');
-      setSeats({ cox: null, seat1: null, seat2: null, seat3: null, seat4: null, seat5: null, seat6: null, seat7: null, seat8: null });
+      setSeats({
+        cox: null,
+        seat1: null,
+        seat2: null,
+        seat3: null,
+        seat4: null,
+        seat5: null,
+        seat6: null,
+        seat7: null,
+        seat8: null,
+      });
     }
   }, [visible, editingCrew]);
 
-  const selectedBoat = boats.find((b) => b.id === boatId) ?? null;
+  const selectedBoat = boats.find(b => b.id === boatId) ?? null;
   const boatClass = selectedBoat
-    ? boatClasses.find((bc) => bc.id === selectedBoat.boatClassId) ?? null
+    ? boatClasses.find(bc => bc.id === selectedBoat.boatClassId) ?? null
     : null;
   const crewCount = boatClass?.crewCount ?? 2;
   const hasCox = boatClass?.hasCox ?? false;
 
-  const activeSeatKeys = ALL_SEAT_KEYS.filter((k) => {
+  const activeSeatKeys = ALL_SEAT_KEYS.filter(k => {
     if (k === 'cox') return hasCox;
     const num = parseInt(k.replace('seat', ''), 10);
     return num <= crewCount;
   });
 
-  const setSeat = useCallback(({ key, memberId }: { key: SeatKey; memberId: number | null }) => {
-    setSeats((prev) => ({ ...prev, [key]: memberId }));
-  }, []);
+  const setSeat = useCallback(
+    ({key, memberId}: {key: SeatKey; memberId: number | null}) => {
+      setSeats(prev => ({...prev, [key]: memberId}));
+    },
+    [],
+  );
 
   const handleSubmit = useCallback(async () => {
     if (!boatId) {
@@ -336,7 +439,7 @@ function CrewModal({ visible, boats, boatClasses, crewMembers, editingCrew, onCl
     }
     setSubmitting(true);
     try {
-      await onSubmit({ boatId, gender, ageCategory, seats });
+      await onSubmit({boatId, gender, ageCategory, seats});
       onClose();
     } catch {
       Alert.alert('Error', 'Failed to save crew.');
@@ -349,22 +452,40 @@ function CrewModal({ visible, boats, boatClasses, crewMembers, editingCrew, onCl
   const AGE_CATS: AgeCategory[] = ['Open', 'U19', 'U17', 'U15'];
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity style={[styles.modal, styles.modalLarge]} activeOpacity={1}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}>
+      <TouchableOpacity
+        style={styles.overlay}
+        activeOpacity={1}
+        onPress={onClose}>
+        <TouchableOpacity
+          style={[styles.modal, styles.modalLarge]}
+          activeOpacity={1}>
           <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
-            <Text style={styles.modalTitle}>{editingCrew ? 'Edit Crew' : 'New Crew'}</Text>
+            <Text style={styles.modalTitle}>
+              {editingCrew ? 'Edit Crew' : 'New Crew'}
+            </Text>
 
             <Text style={styles.sectionLabel}>Boat</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
-              {boats.map((b) => (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.chipScroll}>
+              {boats.map(b => (
                 <TouchableOpacity
                   key={b.id}
                   style={[styles.chip, boatId === b.id && styles.chipActive]}
-                  onPress={() => setBoatId(b.id)}
-                >
-                  <Text style={[styles.chipText, boatId === b.id && styles.chipTextActive]}>
-                    {b.name}{b.boatClassSymbol ? ` (${b.boatClassSymbol})` : ''}
+                  onPress={() => setBoatId(b.id)}>
+                  <Text
+                    style={[
+                      styles.chipText,
+                      boatId === b.id && styles.chipTextActive,
+                    ]}>
+                    {b.name}
+                    {b.boatClassSymbol ? ` (${b.boatClassSymbol})` : ''}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -372,26 +493,42 @@ function CrewModal({ visible, boats, boatClasses, crewMembers, editingCrew, onCl
 
             <Text style={styles.sectionLabel}>Gender</Text>
             <View style={styles.toggleRow}>
-              {GENDERS.map((g) => (
+              {GENDERS.map(g => (
                 <TouchableOpacity
                   key={g}
-                  style={[styles.toggleBtn, gender === g && styles.toggleBtnActive]}
-                  onPress={() => setGender(g)}
-                >
-                  <Text style={[styles.toggleBtnText, gender === g && styles.toggleBtnTextActive]}>{g}</Text>
+                  style={[
+                    styles.toggleBtn,
+                    gender === g && styles.toggleBtnActive,
+                  ]}
+                  onPress={() => setGender(g)}>
+                  <Text
+                    style={[
+                      styles.toggleBtnText,
+                      gender === g && styles.toggleBtnTextActive,
+                    ]}>
+                    {g}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
             <Text style={styles.sectionLabel}>Age Category</Text>
             <View style={styles.toggleRow}>
-              {AGE_CATS.map((cat) => (
+              {AGE_CATS.map(cat => (
                 <TouchableOpacity
                   key={cat}
-                  style={[styles.toggleBtn, ageCategory === cat && styles.toggleBtnActive]}
-                  onPress={() => setAgeCategory(cat)}
-                >
-                  <Text style={[styles.toggleBtnText, ageCategory === cat && styles.toggleBtnTextActive]}>{cat}</Text>
+                  style={[
+                    styles.toggleBtn,
+                    ageCategory === cat && styles.toggleBtnActive,
+                  ]}
+                  onPress={() => setAgeCategory(cat)}>
+                  <Text
+                    style={[
+                      styles.toggleBtnText,
+                      ageCategory === cat && styles.toggleBtnTextActive,
+                    ]}>
+                    {cat}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -399,23 +536,42 @@ function CrewModal({ visible, boats, boatClasses, crewMembers, editingCrew, onCl
             {boatId && (
               <>
                 <Text style={styles.sectionLabel}>Seat Assignments</Text>
-                {activeSeatKeys.map((key) => (
+                {activeSeatKeys.map(key => (
                   <View key={key} style={styles.seatRow}>
-                    <Text style={styles.seatLabel}>{seatLabel({ key, crewCount })}</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
+                    <Text style={styles.seatLabel}>
+                      {seatLabel({key, crewCount})}
+                    </Text>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      style={styles.chipScroll}>
                       <TouchableOpacity
-                        style={[styles.chip, seats[key] === null && styles.chipActive]}
-                        onPress={() => setSeat({ key, memberId: null })}
-                      >
-                        <Text style={[styles.chipText, seats[key] === null && styles.chipTextActive]}>None</Text>
+                        style={[
+                          styles.chip,
+                          seats[key] === null && styles.chipActive,
+                        ]}
+                        onPress={() => setSeat({key, memberId: null})}>
+                        <Text
+                          style={[
+                            styles.chipText,
+                            seats[key] === null && styles.chipTextActive,
+                          ]}>
+                          None
+                        </Text>
                       </TouchableOpacity>
-                      {crewMembers.map((m) => (
+                      {crewMembers.map(m => (
                         <TouchableOpacity
                           key={m.id}
-                          style={[styles.chip, seats[key] === m.id && styles.chipActive]}
-                          onPress={() => setSeat({ key, memberId: m.id })}
-                        >
-                          <Text style={[styles.chipText, seats[key] === m.id && styles.chipTextActive]}>
+                          style={[
+                            styles.chip,
+                            seats[key] === m.id && styles.chipActive,
+                          ]}
+                          onPress={() => setSeat({key, memberId: m.id})}>
+                          <Text
+                            style={[
+                              styles.chipText,
+                              seats[key] === m.id && styles.chipTextActive,
+                            ]}>
                             {m.name}
                           </Text>
                         </TouchableOpacity>
@@ -431,14 +587,19 @@ function CrewModal({ visible, boats, boatClasses, crewMembers, editingCrew, onCl
                 <Text style={styles.cancelBtnText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.createBtn, (!boatId || submitting) && styles.createBtnDisabled]}
+                style={[
+                  styles.createBtn,
+                  (!boatId || submitting) && styles.createBtnDisabled,
+                ]}
                 onPress={handleSubmit}
-                disabled={!boatId || submitting}
-              >
-                {submitting
-                  ? <ActivityIndicator size="small" color={COLORS.surface} />
-                  : <Text style={styles.createBtnText}>{editingCrew ? 'Save' : 'Create'}</Text>
-                }
+                disabled={!boatId || submitting}>
+                {submitting ? (
+                  <ActivityIndicator size="small" color={COLORS.surface} />
+                ) : (
+                  <Text style={styles.createBtnText}>
+                    {editingCrew ? 'Save' : 'Create'}
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -452,10 +613,21 @@ type CreateBoatModalProps = {
   visible: boolean;
   boatClasses: BoatClass[];
   onClose: () => void;
-  onSubmit: ({ name, boatClassId }: { name: string; boatClassId?: number }) => Promise<void>;
+  onSubmit: ({
+    name,
+    boatClassId,
+  }: {
+    name: string;
+    boatClassId?: number;
+  }) => Promise<void>;
 };
 
-function CreateBoatModal({ visible, boatClasses, onClose, onSubmit }: CreateBoatModalProps): ReactElement {
+function CreateBoatModal({
+  visible,
+  boatClasses,
+  onClose,
+  onSubmit,
+}: CreateBoatModalProps): ReactElement {
   const [name, setName] = useState('');
   const [boatClassId, setBoatClassId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -473,7 +645,10 @@ function CreateBoatModal({ visible, boatClasses, onClose, onSubmit }: CreateBoat
     }
     setSubmitting(true);
     try {
-      await onSubmit({ name: name.trim(), boatClassId: boatClassId ?? undefined });
+      await onSubmit({
+        name: name.trim(),
+        boatClassId: boatClassId ?? undefined,
+      });
       setName('');
       setBoatClassId(null);
     } catch {
@@ -484,8 +659,15 @@ function CreateBoatModal({ visible, boatClasses, onClose, onSubmit }: CreateBoat
   }, [name, boatClassId, onSubmit]);
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={handleClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}>
+      <TouchableOpacity
+        style={styles.overlay}
+        activeOpacity={1}
+        onPress={handleClose}>
         <TouchableOpacity style={styles.modal} activeOpacity={1}>
           <Text style={styles.modalTitle}>New Boat</Text>
 
@@ -499,20 +681,36 @@ function CreateBoatModal({ visible, boatClasses, onClose, onSubmit }: CreateBoat
           />
 
           <Text style={styles.sectionLabel}>Class (optional)</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.chipScroll}>
             <TouchableOpacity
               style={[styles.chip, boatClassId === null && styles.chipActive]}
-              onPress={() => setBoatClassId(null)}
-            >
-              <Text style={[styles.chipText, boatClassId === null && styles.chipTextActive]}>None</Text>
+              onPress={() => setBoatClassId(null)}>
+              <Text
+                style={[
+                  styles.chipText,
+                  boatClassId === null && styles.chipTextActive,
+                ]}>
+                None
+              </Text>
             </TouchableOpacity>
-            {boatClasses.map((bc) => (
+            {boatClasses.map(bc => (
               <TouchableOpacity
                 key={bc.id}
-                style={[styles.chip, boatClassId === bc.id && styles.chipActive]}
-                onPress={() => setBoatClassId(bc.id)}
-              >
-                <Text style={[styles.chipText, boatClassId === bc.id && styles.chipTextActive]}>{bc.symbol}</Text>
+                style={[
+                  styles.chip,
+                  boatClassId === bc.id && styles.chipActive,
+                ]}
+                onPress={() => setBoatClassId(bc.id)}>
+                <Text
+                  style={[
+                    styles.chipText,
+                    boatClassId === bc.id && styles.chipTextActive,
+                  ]}>
+                  {bc.symbol}
+                </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -522,14 +720,17 @@ function CreateBoatModal({ visible, boatClasses, onClose, onSubmit }: CreateBoat
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.createBtn, (!name.trim() || submitting) && styles.createBtnDisabled]}
+              style={[
+                styles.createBtn,
+                (!name.trim() || submitting) && styles.createBtnDisabled,
+              ]}
               onPress={handleSubmit}
-              disabled={!name.trim() || submitting}
-            >
-              {submitting
-                ? <ActivityIndicator size="small" color={COLORS.surface} />
-                : <Text style={styles.createBtnText}>Create</Text>
-              }
+              disabled={!name.trim() || submitting}>
+              {submitting ? (
+                <ActivityIndicator size="small" color={COLORS.surface} />
+              ) : (
+                <Text style={styles.createBtnText}>Create</Text>
+              )}
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -541,10 +742,14 @@ function CreateBoatModal({ visible, boatClasses, onClose, onSubmit }: CreateBoat
 type CrewMemberModalProps = {
   visible: boolean;
   onClose: () => void;
-  onSubmit: ({ name, gender }: { name: string; gender: string }) => Promise<void>;
+  onSubmit: ({name, gender}: {name: string; gender: string}) => Promise<void>;
 };
 
-function CrewMemberModal({ visible, onClose, onSubmit }: CrewMemberModalProps): ReactElement {
+function CrewMemberModal({
+  visible,
+  onClose,
+  onSubmit,
+}: CrewMemberModalProps): ReactElement {
   const [name, setName] = useState('');
   const [gender, setGender] = useState<'Men' | 'Women'>('Men');
   const [submitting, setSubmitting] = useState(false);
@@ -562,7 +767,7 @@ function CrewMemberModal({ visible, onClose, onSubmit }: CrewMemberModalProps): 
     }
     setSubmitting(true);
     try {
-      await onSubmit({ name: name.trim(), gender });
+      await onSubmit({name: name.trim(), gender});
       setName('');
       setGender('Men');
     } catch {
@@ -573,8 +778,15 @@ function CrewMemberModal({ visible, onClose, onSubmit }: CrewMemberModalProps): 
   }, [name, gender, onSubmit]);
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={handleClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}>
+      <TouchableOpacity
+        style={styles.overlay}
+        activeOpacity={1}
+        onPress={handleClose}>
         <TouchableOpacity style={styles.modal} activeOpacity={1}>
           <Text style={styles.modalTitle}>New Member</Text>
 
@@ -589,16 +801,32 @@ function CrewMemberModal({ visible, onClose, onSubmit }: CrewMemberModalProps): 
 
           <View style={styles.toggleRow}>
             <TouchableOpacity
-              style={[styles.toggleBtn, gender === 'Men' && styles.toggleBtnActive]}
-              onPress={() => setGender('Men')}
-            >
-              <Text style={[styles.toggleBtnText, gender === 'Men' && styles.toggleBtnTextActive]}>Men</Text>
+              style={[
+                styles.toggleBtn,
+                gender === 'Men' && styles.toggleBtnActive,
+              ]}
+              onPress={() => setGender('Men')}>
+              <Text
+                style={[
+                  styles.toggleBtnText,
+                  gender === 'Men' && styles.toggleBtnTextActive,
+                ]}>
+                Men
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.toggleBtn, gender === 'Women' && styles.toggleBtnActive]}
-              onPress={() => setGender('Women')}
-            >
-              <Text style={[styles.toggleBtnText, gender === 'Women' && styles.toggleBtnTextActive]}>Women</Text>
+              style={[
+                styles.toggleBtn,
+                gender === 'Women' && styles.toggleBtnActive,
+              ]}
+              onPress={() => setGender('Women')}>
+              <Text
+                style={[
+                  styles.toggleBtnText,
+                  gender === 'Women' && styles.toggleBtnTextActive,
+                ]}>
+                Women
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -607,14 +835,17 @@ function CrewMemberModal({ visible, onClose, onSubmit }: CrewMemberModalProps): 
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.createBtn, (!name.trim() || submitting) && styles.createBtnDisabled]}
+              style={[
+                styles.createBtn,
+                (!name.trim() || submitting) && styles.createBtnDisabled,
+              ]}
               onPress={handleSubmit}
-              disabled={!name.trim() || submitting}
-            >
-              {submitting
-                ? <ActivityIndicator size="small" color={COLORS.surface} />
-                : <Text style={styles.createBtnText}>Create</Text>
-              }
+              disabled={!name.trim() || submitting}>
+              {submitting ? (
+                <ActivityIndicator size="small" color={COLORS.surface} />
+              ) : (
+                <Text style={styles.createBtnText}>Create</Text>
+              )}
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -629,68 +860,111 @@ type RaceCardProps = {
   onLongPress: () => void;
 };
 
-function RaceCard({ race, onPress, onLongPress }: RaceCardProps): ReactElement {
+function RaceCard({race, onPress, onLongPress}: RaceCardProps): ReactElement {
   const [rankBy, setRankBy] = useState<'time' | 'wbt'>('wbt');
-  const typeColor = raceTypeBadgeColor({ raceType: race.raceType });
-  const typeLabel = raceTypeBadgeLabel({ raceType: race.raceType });
-  const stColor = statusBadgeColor({ status: race.status });
-  const stLabel = statusBadgeLabel({ status: race.status });
+  const typeColor = raceTypeBadgeColor({raceType: race.raceType});
+  const typeLabel = raceTypeBadgeLabel({raceType: race.raceType});
+  const stColor = statusBadgeColor({status: race.status});
+  const stLabel = statusBadgeLabel({status: race.status});
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} onLongPress={onLongPress} activeOpacity={0.75}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      activeOpacity={0.75}>
       <View style={styles.cardTopRow}>
         <Text style={styles.raceDistance}>{race.distance}m</Text>
-        <View style={[styles.badge, { backgroundColor: typeColor + '20' }]}>
-          <Text style={[styles.badgeText, { color: typeColor }]}>{typeLabel}</Text>
+        <View style={[styles.badge, {backgroundColor: typeColor + '20'}]}>
+          <Text style={[styles.badgeText, {color: typeColor}]}>
+            {typeLabel}
+          </Text>
         </View>
-        <View style={[styles.badge, { backgroundColor: stColor + '20' }]}>
-          <Text style={[styles.badgeText, { color: stColor }]}>{stLabel}</Text>
+        <View style={[styles.badge, {backgroundColor: stColor + '20'}]}>
+          <Text style={[styles.badgeText, {color: stColor}]}>{stLabel}</Text>
         </View>
         <Icon name="chevron-right" size={18} color={COLORS.textMuted} />
       </View>
 
-      {race.entries.length > 0 && (() => {
-        const finishedEntries = race.entries.filter((e) => e.elapsedMs !== null && !e.dns && !e.dnf);
-        const otherEntries = race.entries.filter((e) => e.elapsedMs === null || e.dns || e.dnf);
-        const hasWbt = finishedEntries.some((e) => e.wbtPct !== null);
-        const sortedFinished = rankBy === 'wbt' && hasWbt
-          ? [...finishedEntries].sort((a, b) => (b.wbtPct ?? -1) - (a.wbtPct ?? -1))
-          : [...finishedEntries].sort((a, b) => (a.placement ?? 999) - (b.placement ?? 999));
-        return (
-          <View style={styles.entryList}>
-            {hasWbt && finishedEntries.length >= 2 && (
-              <View style={styles.rankToggleRow}>
-                <Text style={styles.rankToggleLabel}>Rank by</Text>
-                <TouchableOpacity style={[styles.rankToggleBtn, rankBy === 'time' && styles.rankToggleBtnActive]} onPress={() => setRankBy('time')}>
-                  <Text style={[styles.rankToggleBtnText, rankBy === 'time' && styles.rankToggleBtnTextActive]}>Time</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.rankToggleBtn, rankBy === 'wbt' && styles.rankToggleBtnActive]} onPress={() => setRankBy('wbt')}>
-                  <Text style={[styles.rankToggleBtnText, rankBy === 'wbt' && styles.rankToggleBtnTextActive]}>WBT%</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {[...sortedFinished, ...otherEntries].map((entry) => (
-              <View key={entry.id} style={styles.entryRow}>
-                <Icon name="rowing" size={13} color={COLORS.textMuted} />
-                <Text style={styles.entryBoat}>{entry.boatName}</Text>
-                {entry.keyPerson ? (
-                  <Text style={styles.entryKey}>{entry.keyPerson}</Text>
-                ) : null}
-                {entry.elapsedMs !== null && (
-                  <View style={styles.entryTimeBlock}>
-                    <Text style={styles.entryTime}>{formatElapsedMs({ ms: entry.elapsedMs })}</Text>
-                    {entry.wbtPct !== null && (
-                      <Text style={styles.wbtBadge}>{entry.wbtPct.toFixed(1)}% WBT{entry.wbtIsEstimated ? '*' : ''}</Text>
-                    )}
-                  </View>
-                )}
-                {entry.dns && <Text style={styles.dnsBadgeSmall}>DNS</Text>}
-                {entry.dnf && <Text style={styles.dnfBadgeSmall}>DNF</Text>}
-              </View>
-            ))}
-          </View>
-        );
-      })()}
+      {race.entries.length > 0 &&
+        (() => {
+          const finishedEntries = race.entries.filter(
+            e => e.elapsedMs !== null && !e.dns && !e.dnf,
+          );
+          const otherEntries = race.entries.filter(
+            e => e.elapsedMs === null || e.dns || e.dnf,
+          );
+          const hasWbt = finishedEntries.some(e => e.wbtPct !== null);
+          const sortedFinished =
+            rankBy === 'wbt' && hasWbt
+              ? [...finishedEntries].sort(
+                  (a, b) => (b.wbtPct ?? -1) - (a.wbtPct ?? -1),
+                )
+              : [...finishedEntries].sort(
+                  (a, b) => (a.placement ?? 999) - (b.placement ?? 999),
+                );
+          return (
+            <View style={styles.entryList}>
+              {hasWbt && finishedEntries.length >= 2 && (
+                <View style={styles.rankToggleRow}>
+                  <Text style={styles.rankToggleLabel}>Rank by</Text>
+                  <TouchableOpacity
+                    style={[
+                      styles.rankToggleBtn,
+                      rankBy === 'time' && styles.rankToggleBtnActive,
+                    ]}
+                    onPress={() => setRankBy('time')}>
+                    <Text
+                      style={[
+                        styles.rankToggleBtnText,
+                        rankBy === 'time' && styles.rankToggleBtnTextActive,
+                      ]}>
+                      Time
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.rankToggleBtn,
+                      rankBy === 'wbt' && styles.rankToggleBtnActive,
+                    ]}
+                    onPress={() => setRankBy('wbt')}>
+                    <Text
+                      style={[
+                        styles.rankToggleBtnText,
+                        rankBy === 'wbt' && styles.rankToggleBtnTextActive,
+                      ]}>
+                      WBT%
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              {[...sortedFinished, ...otherEntries].map(entry => (
+                <View key={entry.id} style={styles.entryRow}>
+                  <Icon name="rowing" size={13} color={COLORS.textMuted} />
+                  <Text style={styles.entryBoat}>{entry.boatName}</Text>
+                  {entry.keyPerson ? (
+                    <Text style={styles.entryKey}>{entry.keyPerson}</Text>
+                  ) : null}
+                  {entry.elapsedMs !== null && (
+                    <View style={styles.entryTimeBlock}>
+                      <Text style={styles.entryTime}>
+                        {formatElapsedMs({ms: entry.elapsedMs})}
+                      </Text>
+                      {entry.wbtPct !== null && (
+                        <Text style={styles.wbtBadge}>
+                          {entry.wbtPct.toFixed(1)}% WBT
+                          {entry.wbtIsEstimated ? '*' : ''}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                  {entry.dns && <Text style={styles.dnsBadgeSmall}>DNS</Text>}
+                  {entry.dnf && <Text style={styles.dnfBadgeSmall}>DNF</Text>}
+                </View>
+              ))}
+            </View>
+          );
+        })()}
     </TouchableOpacity>
   );
 }
@@ -707,11 +981,26 @@ function Rowing(): ReactElement {
   const [showMemberModal, setShowMemberModal] = useState(false);
 
   const {
-    boatClasses, crewMembers, boats, crews, races, isLoading,
-    fetchAllBoatClasses, fetchAllCrew, addCrewMember, removeCrewMember,
-    fetchAllBoats, addBoat, removeBoat,
-    fetchAllCrews, addCrew, editCrew, removeCrew,
-    fetchAllRaces, startRace, removeRace,
+    boatClasses,
+    crewMembers,
+    boats,
+    crews,
+    races,
+    isLoading,
+    fetchAllBoatClasses,
+    fetchAllCrew,
+    addCrewMember,
+    removeCrewMember,
+    fetchAllBoats,
+    addBoat,
+    removeBoat,
+    fetchAllCrews,
+    addCrew,
+    editCrew,
+    removeCrew,
+    fetchAllRaces,
+    startRace,
+    removeRace,
   } = useRowing();
 
   const loadInitial = useCallback(async () => {
@@ -728,138 +1017,156 @@ function Rowing(): ReactElement {
   }, [loadInitial]);
 
   useEffect(() => {
-    fetchAllRaces({ date });
+    fetchAllRaces({date});
   }, [date, fetchAllRaces]);
 
   const handlePrevDay = useCallback(() => {
-    setDate((d) => addDays({ dateStr: d, delta: -1 }));
+    setDate(d => addDays({dateStr: d, delta: -1}));
   }, []);
 
   const handleNextDay = useCallback(() => {
-    setDate((d) => addDays({ dateStr: d, delta: 1 }));
+    setDate(d => addDays({dateStr: d, delta: 1}));
   }, []);
 
-  const handleCreateRace = useCallback(async ({
-    distance,
-    raceType,
-    crewIds,
-    windConditions,
-    notes,
-  }: {
-    distance: string;
-    raceType: RaceType;
-    crewIds: number[];
-    windConditions?: string;
-    notes?: string;
-  }) => {
-    const raceId = await startRace({ distance, raceType, crewIds, windConditions, notes });
-    setShowCreateRace(false);
-    navigation.navigate('RaceTimer', { raceId });
-  }, [startRace, navigation]);
+  const handleCreateRace = useCallback(
+    async ({
+      distance,
+      raceType,
+      crewIds,
+      windConditions,
+      notes,
+    }: {
+      distance: string;
+      raceType: RaceType;
+      crewIds: number[];
+      windConditions?: string;
+      notes?: string;
+    }) => {
+      const raceId = await startRace({
+        distance,
+        raceType,
+        crewIds,
+        windConditions,
+        notes,
+      });
+      setShowCreateRace(false);
+      navigation.navigate('RaceTimer', {raceId});
+    },
+    [startRace, navigation],
+  );
 
-  const handleDeleteRace = useCallback(({ race }: { race: Race }) => {
-    Alert.alert(
-      'Delete Race',
-      `Delete ${race.distance}m race? This cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeRace({ id: race.id, date });
-            } catch {
-              Alert.alert('Error', 'Failed to delete race.');
-            }
+  const handleDeleteRace = useCallback(
+    ({race}: {race: Race}) => {
+      Alert.alert(
+        'Delete Race',
+        `Delete ${race.distance}m race? This cannot be undone.`,
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await removeRace({id: race.id, date});
+              } catch {
+                Alert.alert('Error', 'Failed to delete race.');
+              }
+            },
           },
-        },
-      ],
-    );
-  }, [removeRace, date]);
+        ],
+      );
+    },
+    [removeRace, date],
+  );
 
-  const handleCreateCrew = useCallback(async ({
-    boatId,
-    gender,
-    ageCategory,
-    seats,
-  }: {
-    boatId: number;
-    gender: Gender;
-    ageCategory: AgeCategory;
-    seats: CrewSeats;
-  }) => {
-    if (editingCrew) {
-      await editCrew({ id: editingCrew.id, boatId, gender, ageCategory, ...seats });
-    } else {
-      await addCrew({ boatId, gender, ageCategory, ...seats });
-    }
-    setEditingCrew(null);
-    setShowCrewModal(false);
-  }, [editingCrew, editCrew, addCrew]);
+  const handleCreateCrew = useCallback(
+    async ({
+      boatId,
+      gender,
+      ageCategory,
+      seats,
+    }: {
+      boatId: number;
+      gender: Gender;
+      ageCategory: AgeCategory;
+      seats: CrewSeats;
+    }) => {
+      if (editingCrew) {
+        await editCrew({
+          id: editingCrew.id,
+          boatId,
+          gender,
+          ageCategory,
+          ...seats,
+        });
+      } else {
+        await addCrew({boatId, gender, ageCategory, ...seats});
+      }
+      setEditingCrew(null);
+      setShowCrewModal(false);
+    },
+    [editingCrew, editCrew, addCrew],
+  );
 
-  const handleDeleteCrew = useCallback(({ crew }: { crew: Crew }) => {
-    Alert.alert(
-      'Delete Crew',
-      `Delete crew for ${crew.boatName}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
+  const handleDeleteCrew = useCallback(
+    ({crew}: {crew: Crew}) => {
+      Alert.alert('Delete Crew', `Delete crew for ${crew.boatName}?`, [
+        {text: 'Cancel', style: 'cancel'},
         {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
-              await removeCrew({ id: crew.id });
+              await removeCrew({id: crew.id});
             } catch {
               Alert.alert('Error', 'Failed to delete crew.');
             }
           },
         },
-      ],
-    );
-  }, [removeCrew]);
+      ]);
+    },
+    [removeCrew],
+  );
 
-  const handleDeleteBoat = useCallback(({ boat }: { boat: Boat }) => {
-    Alert.alert(
-      'Delete Boat',
-      `Delete "${boat.name}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
+  const handleDeleteBoat = useCallback(
+    ({boat}: {boat: Boat}) => {
+      Alert.alert('Delete Boat', `Delete "${boat.name}"?`, [
+        {text: 'Cancel', style: 'cancel'},
         {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
-              await removeBoat({ id: boat.id });
+              await removeBoat({id: boat.id});
             } catch {
               Alert.alert('Error', 'Failed to delete boat.');
             }
           },
         },
-      ],
-    );
-  }, [removeBoat]);
+      ]);
+    },
+    [removeBoat],
+  );
 
-  const handleDeleteMember = useCallback(({ member }: { member: CrewMember }) => {
-    Alert.alert(
-      'Delete Member',
-      `Delete "${member.name}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
+  const handleDeleteMember = useCallback(
+    ({member}: {member: CrewMember}) => {
+      Alert.alert('Delete Member', `Delete "${member.name}"?`, [
+        {text: 'Cancel', style: 'cancel'},
         {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
-              await removeCrewMember({ id: member.id });
+              await removeCrewMember({id: member.id});
             } catch {
               Alert.alert('Error', 'Failed to delete member.');
             }
           },
         },
-      ],
-    );
-  }, [removeCrewMember]);
+      ]);
+    },
+    [removeCrewMember],
+  );
 
   const renderRacesTab = (): ReactElement => (
     <View style={styles.tabContent}>
@@ -873,16 +1180,18 @@ function Rowing(): ReactElement {
           <Text style={styles.emptyText}>No races on this day</Text>
         </View>
       ) : (
-        races.map((race) => (
+        races.map(race => (
           <RaceCard
             key={race.id}
             race={race}
-            onPress={() => navigation.navigate('RaceTimer', { raceId: race.id })}
-            onLongPress={() => handleDeleteRace({ race })}
+            onPress={() => navigation.navigate('RaceTimer', {raceId: race.id})}
+            onLongPress={() => handleDeleteRace({race})}
           />
         ))
       )}
-      <TouchableOpacity style={styles.fab} onPress={() => setShowCreateRace(true)}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setShowCreateRace(true)}>
         <Icon name="plus" size={24} color={COLORS.surface} />
         <Text style={styles.fabText}>New Race</Text>
       </TouchableOpacity>
@@ -893,11 +1202,15 @@ function Rowing(): ReactElement {
     <View style={styles.tabContent}>
       {crews.length === 0 ? (
         <View style={styles.centered}>
-          <Icon name="account-group-outline" size={40} color={COLORS.textMuted} />
+          <Icon
+            name="account-group-outline"
+            size={40}
+            color={COLORS.textMuted}
+          />
           <Text style={styles.emptyText}>No crews yet</Text>
         </View>
       ) : (
-        crews.map((crew) => {
+        crews.map(crew => {
           const keyPerson = crew.cox?.name ?? crew.seat1?.name ?? null;
           return (
             <View key={crew.id} style={styles.card}>
@@ -908,21 +1221,28 @@ function Rowing(): ReactElement {
                     <Text style={styles.cardSub}>{crew.crewClassName}</Text>
                   ) : null}
                   {keyPerson ? (
-                    <Text style={styles.cardSub}>{crew.boatClassHasCox ? 'Cox' : 'Stroke'}: {keyPerson}</Text>
+                    <Text style={styles.cardSub}>
+                      {crew.boatClassHasCox ? 'Cox' : 'Stroke'}: {keyPerson}
+                    </Text>
                   ) : null}
                 </View>
                 <TouchableOpacity
                   style={styles.iconBtn}
-                  onPress={() => { setEditingCrew(crew); setShowCrewModal(true); }}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Icon name="pencil-outline" size={18} color={COLORS.primary} />
+                  onPress={() => {
+                    setEditingCrew(crew);
+                    setShowCrewModal(true);
+                  }}
+                  hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+                  <Icon
+                    name="pencil-outline"
+                    size={18}
+                    color={COLORS.primary}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.iconBtn}
-                  onPress={() => handleDeleteCrew({ crew })}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
+                  onPress={() => handleDeleteCrew({crew})}
+                  hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
                   <Icon name="delete-outline" size={18} color={COLORS.error} />
                 </TouchableOpacity>
               </View>
@@ -930,7 +1250,12 @@ function Rowing(): ReactElement {
           );
         })
       )}
-      <TouchableOpacity style={styles.fab} onPress={() => { setEditingCrew(null); setShowCrewModal(true); }}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => {
+          setEditingCrew(null);
+          setShowCrewModal(true);
+        }}>
         <Icon name="plus" size={24} color={COLORS.surface} />
         <Text style={styles.fabText}>New Crew</Text>
       </TouchableOpacity>
@@ -945,7 +1270,7 @@ function Rowing(): ReactElement {
           <Text style={styles.emptyText}>No boats yet</Text>
         </View>
       ) : (
-        boats.map((boat) => (
+        boats.map(boat => (
           <View key={boat.id} style={styles.card}>
             <View style={styles.cardTopRow}>
               <View style={styles.cardTitleGroup}>
@@ -956,16 +1281,17 @@ function Rowing(): ReactElement {
               </View>
               <TouchableOpacity
                 style={styles.iconBtn}
-                onPress={() => handleDeleteBoat({ boat })}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
+                onPress={() => handleDeleteBoat({boat})}
+                hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
                 <Icon name="delete-outline" size={18} color={COLORS.error} />
               </TouchableOpacity>
             </View>
           </View>
         ))
       )}
-      <TouchableOpacity style={styles.fab} onPress={() => setShowBoatModal(true)}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setShowBoatModal(true)}>
         <Icon name="plus" size={24} color={COLORS.surface} />
         <Text style={styles.fabText}>New Boat</Text>
       </TouchableOpacity>
@@ -980,7 +1306,7 @@ function Rowing(): ReactElement {
           <Text style={styles.emptyText}>No members yet</Text>
         </View>
       ) : (
-        crewMembers.map((member) => (
+        crewMembers.map(member => (
           <View key={member.id} style={styles.card}>
             <View style={styles.cardTopRow}>
               <Text style={styles.cardTitle}>{member.name}</Text>
@@ -989,16 +1315,17 @@ function Rowing(): ReactElement {
               </View>
               <TouchableOpacity
                 style={styles.iconBtn}
-                onPress={() => handleDeleteMember({ member })}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
+                onPress={() => handleDeleteMember({member})}
+                hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
                 <Icon name="delete-outline" size={18} color={COLORS.error} />
               </TouchableOpacity>
             </View>
           </View>
         ))
       )}
-      <TouchableOpacity style={styles.fab} onPress={() => setShowMemberModal(true)}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setShowMemberModal(true)}>
         <Icon name="plus" size={24} color={COLORS.surface} />
         <Text style={styles.fabText}>New Member</Text>
       </TouchableOpacity>
@@ -1011,38 +1338,53 @@ function Rowing(): ReactElement {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
+          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
           <Icon name="arrow-left" size={22} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Rowing</Text>
       </View>
 
       <View style={styles.dateBar}>
-        <TouchableOpacity onPress={handlePrevDay} style={styles.dateNavBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <TouchableOpacity
+          onPress={handlePrevDay}
+          style={styles.dateNavBtn}
+          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
           <Icon name="chevron-left" size={24} color={COLORS.primary} />
         </TouchableOpacity>
-        <Text style={styles.dateLabel}>{formatDateLabel({ dateStr: date })}</Text>
-        <TouchableOpacity onPress={handleNextDay} style={styles.dateNavBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <Text style={styles.dateLabel}>{formatDateLabel({dateStr: date})}</Text>
+        <TouchableOpacity
+          onPress={handleNextDay}
+          style={styles.dateNavBtn}
+          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
           <Icon name="chevron-right" size={24} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.tabBar}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabBarContent}>
-          {TABS.map((tab) => (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabBarContent}>
+          {TABS.map(tab => (
             <TouchableOpacity
               key={tab}
               style={[styles.tabBtn, activeTab === tab && styles.tabBtnActive]}
-              onPress={() => setActiveTab(tab)}
-            >
-              <Text style={[styles.tabBtnText, activeTab === tab && styles.tabBtnTextActive]}>{tab}</Text>
+              onPress={() => setActiveTab(tab)}>
+              <Text
+                style={[
+                  styles.tabBtnText,
+                  activeTab === tab && styles.tabBtnTextActive,
+                ]}>
+                {tab}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={styles.scrollContent}>
         {activeTab === 'Races' && renderRacesTab()}
         {activeTab === 'Crews' && renderCrewsTab()}
         {activeTab === 'Boats' && renderBoatsTab()}
@@ -1062,7 +1404,10 @@ function Rowing(): ReactElement {
         boatClasses={boatClasses}
         crewMembers={crewMembers}
         editingCrew={editingCrew}
-        onClose={() => { setShowCrewModal(false); setEditingCrew(null); }}
+        onClose={() => {
+          setShowCrewModal(false);
+          setEditingCrew(null);
+        }}
         onSubmit={handleCreateCrew}
       />
 

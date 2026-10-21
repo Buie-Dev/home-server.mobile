@@ -1,9 +1,9 @@
 import React from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react-native';
+import {renderHook, act, waitFor} from '@testing-library/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UnitProvider, useUnit } from '../../context/UnitContext';
+import {UnitProvider, useUnit} from '../../context/UnitContext';
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
+const wrapper = ({children}: {children: React.ReactNode}) => (
   <UnitProvider>{children}</UnitProvider>
 );
 
@@ -14,7 +14,7 @@ beforeEach(() => {
 describe('UnitContext', () => {
   it('defaults to litres (useGallons = false)', async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
-    const { result } = renderHook(() => useUnit(), { wrapper });
+    const {result} = renderHook(() => useUnit(), {wrapper});
     await waitFor(() => {
       expect(result.current.useGallons).toBe(false);
     });
@@ -22,7 +22,7 @@ describe('UnitContext', () => {
 
   it('loads gallons preference from AsyncStorage', async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue('gallons');
-    const { result } = renderHook(() => useUnit(), { wrapper });
+    const {result} = renderHook(() => useUnit(), {wrapper});
     await waitFor(() => {
       expect(result.current.useGallons).toBe(true);
     });
@@ -30,7 +30,7 @@ describe('UnitContext', () => {
 
   it('toggleUnit switches from litres to gallons and persists', async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
-    const { result } = renderHook(() => useUnit(), { wrapper });
+    const {result} = renderHook(() => useUnit(), {wrapper});
     await waitFor(() => expect(result.current.useGallons).toBe(false));
 
     act(() => {
@@ -38,12 +38,15 @@ describe('UnitContext', () => {
     });
 
     expect(result.current.useGallons).toBe(true);
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith('unit_preference', 'gallons');
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+      'unit_preference',
+      'gallons',
+    );
   });
 
   it('toggleUnit switches from gallons to litres and persists', async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue('gallons');
-    const { result } = renderHook(() => useUnit(), { wrapper });
+    const {result} = renderHook(() => useUnit(), {wrapper});
     await waitFor(() => expect(result.current.useGallons).toBe(true));
 
     act(() => {
@@ -51,6 +54,9 @@ describe('UnitContext', () => {
     });
 
     expect(result.current.useGallons).toBe(false);
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith('unit_preference', 'litres');
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+      'unit_preference',
+      'litres',
+    );
   });
 });

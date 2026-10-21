@@ -1,8 +1,13 @@
-import { useRef, useState } from 'react';
+import {useRef, useState} from 'react';
 import * as eventsApi from '../api/events.api';
 
-export type EventSubcategory = { id: number; name: string; categoryId: number };
-export type EventCategory = { id: number; name: string; subcategories: EventSubcategory[]; itemCount: number };
+export type EventSubcategory = {id: number; name: string; categoryId: number};
+export type EventCategory = {
+  id: number;
+  name: string;
+  subcategories: EventSubcategory[];
+  itemCount: number;
+};
 export type CalendarEvent = {
   id: number;
   title: string;
@@ -15,8 +20,20 @@ export type CalendarEvent = {
   subcategoryName?: string;
 };
 
-type EventPayload = { title: string; description?: string; date: string; time?: string; categoryId: number; subcategoryId?: number };
-type FilterRef = { categoryId?: number; subcategoryId?: number; month?: number; year?: number };
+type EventPayload = {
+  title: string;
+  description?: string;
+  date: string;
+  time?: string;
+  categoryId: number;
+  subcategoryId?: number;
+};
+type FilterRef = {
+  categoryId?: number;
+  subcategoryId?: number;
+  month?: number;
+  year?: number;
+};
 
 function useEvents() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -24,11 +41,21 @@ function useEvents() {
   const [loading, setLoading] = useState(false);
   const filterRef = useRef<FilterRef>({});
 
-  const fetchEvents = async ({ categoryId, subcategoryId, month, year }: FilterRef = {}) => {
-    filterRef.current = { categoryId, subcategoryId, month, year };
+  const fetchEvents = async ({
+    categoryId,
+    subcategoryId,
+    month,
+    year,
+  }: FilterRef = {}) => {
+    filterRef.current = {categoryId, subcategoryId, month, year};
     setLoading(true);
     try {
-      const data = await eventsApi.fetchEvents({ categoryId, subcategoryId, month, year });
+      const data = await eventsApi.fetchEvents({
+        categoryId,
+        subcategoryId,
+        month,
+        year,
+      });
       setEvents(data as CalendarEvent[]);
     } catch (e) {
       console.error('fetchEvents', e);
@@ -38,9 +65,14 @@ function useEvents() {
   };
 
   const refetchEvents = async () => {
-    const { categoryId, subcategoryId, month, year } = filterRef.current;
+    const {categoryId, subcategoryId, month, year} = filterRef.current;
     try {
-      const data = await eventsApi.fetchEvents({ categoryId, subcategoryId, month, year });
+      const data = await eventsApi.fetchEvents({
+        categoryId,
+        subcategoryId,
+        month,
+        year,
+      });
       setEvents(data as CalendarEvent[]);
     } catch (e) {
       console.error('refetchEvents', e);
@@ -56,57 +88,79 @@ function useEvents() {
     }
   };
 
-  const createEvent = async ({ data }: { data: EventPayload }) => {
+  const createEvent = async ({data}: {data: EventPayload}) => {
     await eventsApi.createEvent(data);
     await refetchEvents();
   };
 
-  const updateEvent = async ({ id, data }: { id: number; data: EventPayload }) => {
-    await eventsApi.updateEvent({ id, data });
+  const updateEvent = async ({id, data}: {id: number; data: EventPayload}) => {
+    await eventsApi.updateEvent({id, data});
     await refetchEvents();
   };
 
-  const deleteEvent = async ({ id }: { id: number }) => {
-    await eventsApi.deleteEvent({ id });
+  const deleteEvent = async ({id}: {id: number}) => {
+    await eventsApi.deleteEvent({id});
     setEvents(prev => prev.filter(e => e.id !== id));
   };
 
-  const createCategory = async ({ name, subcategoryNames }: { name: string; subcategoryNames: string[] }) => {
-    await eventsApi.createCategory({ name, subcategoryNames });
+  const createCategory = async ({
+    name,
+    subcategoryNames,
+  }: {
+    name: string;
+    subcategoryNames: string[];
+  }) => {
+    await eventsApi.createCategory({name, subcategoryNames});
     await fetchCategories();
   };
 
-  const updateCategory = async ({ id, name }: { id: number; name: string }) => {
-    await eventsApi.updateCategory({ id, name });
+  const updateCategory = async ({id, name}: {id: number; name: string}) => {
+    await eventsApi.updateCategory({id, name});
     await fetchCategories();
   };
 
-  const deleteCategory = async ({ id }: { id: number }) => {
-    await eventsApi.deleteCategory({ id });
+  const deleteCategory = async ({id}: {id: number}) => {
+    await eventsApi.deleteCategory({id});
     await fetchCategories();
   };
 
-  const createSubcategory = async ({ categoryId, name }: { categoryId: number; name: string }) => {
-    await eventsApi.createSubcategory({ categoryId, name });
+  const createSubcategory = async ({
+    categoryId,
+    name,
+  }: {
+    categoryId: number;
+    name: string;
+  }) => {
+    await eventsApi.createSubcategory({categoryId, name});
     await fetchCategories();
   };
 
-  const updateSubcategory = async ({ id, name }: { id: number; name: string }) => {
-    await eventsApi.updateSubcategory({ id, name });
+  const updateSubcategory = async ({id, name}: {id: number; name: string}) => {
+    await eventsApi.updateSubcategory({id, name});
     await fetchCategories();
   };
 
-  const deleteSubcategory = async ({ id }: { id: number }) => {
-    await eventsApi.deleteSubcategory({ id });
+  const deleteSubcategory = async ({id}: {id: number}) => {
+    await eventsApi.deleteSubcategory({id});
     await fetchCategories();
   };
 
   return {
-    events, categories, loading,
-    fetchEvents, refetchEvents, fetchCategories,
-    createEvent, updateEvent, deleteEvent,
-    createCategory, updateCategory, deleteCategory,
-    createSubcategory, updateSubcategory, deleteSubcategory,
+    events,
+    categories,
+    loading,
+    fetchEvents,
+    refetchEvents,
+    fetchCategories,
+    createEvent,
+    updateEvent,
+    deleteEvent,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    createSubcategory,
+    updateSubcategory,
+    deleteSubcategory,
   };
 }
 

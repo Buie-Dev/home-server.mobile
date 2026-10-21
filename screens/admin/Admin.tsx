@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, {ReactElement, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,30 +12,41 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
-import { useAuth } from '../../context/AuthContext';
-import { fetchAllUsers, setUserPermissions, createUser, deleteUser } from '../../api/auth.api';
-import { COLORS, SHADOWS, SPACING, RADIUS } from '../../lib/theme';
+import {useNavigation} from '@react-navigation/native';
+import {useAuth} from '../../context/AuthContext';
+import {
+  fetchAllUsers,
+  setUserPermissions,
+  createUser,
+  deleteUser,
+} from '../../api/auth.api';
+import {COLORS, SHADOWS, SPACING, RADIUS} from '../../lib/theme';
 
 const ALL_PAGES = [
-  { key: 'irrigation', label: 'Irrigation' },
-  { key: 'rowing', label: 'Rowing' },
-  { key: 'people', label: 'People' },
-  { key: 'todo', label: 'To Do' },
-  { key: 'events', label: 'Events' },
-  { key: 'devices', label: 'Devices' },
-  { key: 'admin', label: 'Admin' },
+  {key: 'irrigation', label: 'Irrigation'},
+  {key: 'rowing', label: 'Rowing'},
+  {key: 'people', label: 'People'},
+  {key: 'todo', label: 'To Do'},
+  {key: 'events', label: 'Events'},
+  {key: 'devices', label: 'Devices'},
+  {key: 'admin', label: 'Admin'},
 ];
 
-type UserRow = { id: number; username: string; permissions: Record<string, boolean> };
+type UserRow = {
+  id: number;
+  username: string;
+  permissions: Record<string, boolean>;
+};
 
 function Admin(): ReactElement {
   const navigation = useNavigation();
-  const { userId: currentUserId } = useAuth();
+  const {userId: currentUserId} = useAuth();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<number | null>(null);
-  const [dirty, setDirty] = useState<Record<number, Record<string, boolean>>>({});
+  const [dirty, setDirty] = useState<Record<number, Record<string, boolean>>>(
+    {},
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -43,10 +54,12 @@ function Admin(): ReactElement {
 
   useEffect(() => {
     fetchAllUsers()
-      .then((data) => {
+      .then(data => {
         setUsers(data);
         const initial: Record<number, Record<string, boolean>> = {};
-        data.forEach((u) => { initial[u.id] = { ...u.permissions }; });
+        data.forEach(u => {
+          initial[u.id] = {...u.permissions};
+        });
         setDirty(initial);
       })
       .catch(() => Alert.alert('Error', 'Failed to load users'))
@@ -54,9 +67,9 @@ function Admin(): ReactElement {
   }, []);
 
   const togglePermission = (userId: number, page: string): void => {
-    setDirty((prev) => {
+    setDirty(prev => {
       const current = prev[userId] ?? {};
-      return { ...prev, [userId]: { ...current, [page]: !current[page] } };
+      return {...prev, [userId]: {...current, [page]: !current[page]}};
     });
   };
 
@@ -64,7 +77,11 @@ function Admin(): ReactElement {
     setSaving(userId);
     try {
       await setUserPermissions(userId, dirty[userId] ?? {});
-      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, permissions: { ...dirty[userId] } } : u));
+      setUsers(prev =>
+        prev.map(u =>
+          u.id === userId ? {...u, permissions: {...dirty[userId]}} : u,
+        ),
+      );
     } catch {
       Alert.alert('Error', 'Failed to save permissions');
     } finally {
@@ -76,11 +93,13 @@ function Admin(): ReactElement {
     if (!newUsername.trim() || !newPassword) return;
     setAdding(true);
     try {
-      await createUser({ username: newUsername.trim(), password: newPassword });
+      await createUser({username: newUsername.trim(), password: newPassword});
       const data = await fetchAllUsers();
       setUsers(data);
       const refreshed: Record<number, Record<string, boolean>> = {};
-      data.forEach((u) => { refreshed[u.id] = { ...u.permissions }; });
+      data.forEach(u => {
+        refreshed[u.id] = {...u.permissions};
+      });
       setDirty(refreshed);
       setShowAddModal(false);
       setNewUsername('');
@@ -93,36 +112,42 @@ function Admin(): ReactElement {
   };
 
   const handleDeleteUser = (userId: number, username: string): void => {
-    Alert.alert(
-      'Delete User',
-      `Delete "${username}"? This cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteUser({ userId });
-              setUsers((prev) => prev.filter((u) => u.id !== userId));
-              setDirty((prev) => { const next = { ...prev }; delete next[userId]; return next; });
-            } catch {
-              Alert.alert('Error', 'Failed to delete user');
-            }
-          },
+    Alert.alert('Delete User', `Delete "${username}"? This cannot be undone.`, [
+      {text: 'Cancel', style: 'cancel'},
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteUser({userId});
+            setUsers(prev => prev.filter(u => u.id !== userId));
+            setDirty(prev => {
+              const next = {...prev};
+              delete next[userId];
+              return next;
+            });
+          } catch {
+            Alert.alert('Error', 'Failed to delete user');
+          }
         },
-      ],
-    );
+      },
+    ]);
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
           <Icon name="arrow-left" size={22} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Admin</Text>
-        <TouchableOpacity onPress={() => setShowAddModal(true)} style={styles.addBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <TouchableOpacity
+          onPress={() => setShowAddModal(true)}
+          style={styles.addBtn}
+          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
           <Icon name="account-plus-outline" size={22} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
@@ -133,52 +158,74 @@ function Admin(): ReactElement {
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
-          {users.map((user) => {
+          {users.map(user => {
             const userPerms = dirty[user.id] ?? {};
-            const isDirty = JSON.stringify(userPerms) !== JSON.stringify(user.permissions);
+            const isDirty =
+              JSON.stringify(userPerms) !== JSON.stringify(user.permissions);
             const isSelf = user.id === currentUserId;
 
             return (
               <View key={user.id} style={styles.card}>
                 <View style={styles.cardHeader}>
                   <View style={styles.avatarWrap}>
-                    <Icon name="account-circle-outline" size={20} color={COLORS.primary} />
+                    <Icon
+                      name="account-circle-outline"
+                      size={20}
+                      color={COLORS.primary}
+                    />
                   </View>
                   <Text style={styles.username}>{user.username}</Text>
                   {isDirty && (
                     <TouchableOpacity
                       style={styles.saveBtn}
                       onPress={() => handleSave(user.id)}
-                      disabled={saving === user.id}
-                    >
-                      {saving === user.id
-                        ? <ActivityIndicator size="small" color={COLORS.surface} />
-                        : <Text style={styles.saveBtnText}>Save</Text>
-                      }
+                      disabled={saving === user.id}>
+                      {saving === user.id ? (
+                        <ActivityIndicator
+                          size="small"
+                          color={COLORS.surface}
+                        />
+                      ) : (
+                        <Text style={styles.saveBtnText}>Save</Text>
+                      )}
                     </TouchableOpacity>
                   )}
                   {!isSelf && (
                     <TouchableOpacity
                       style={styles.deleteBtn}
-                      onPress={() => handleDeleteUser(user.id, user.username)}
-                    >
-                      <Icon name="delete-outline" size={18} color={COLORS.error} />
+                      onPress={() => handleDeleteUser(user.id, user.username)}>
+                      <Icon
+                        name="delete-outline"
+                        size={18}
+                        color={COLORS.error}
+                      />
                     </TouchableOpacity>
                   )}
                 </View>
 
                 <View style={styles.chipGrid}>
-                  {ALL_PAGES.map(({ key, label }) => {
+                  {ALL_PAGES.map(({key, label}) => {
                     const granted = !!userPerms[key];
                     const locked = isSelf && key === 'admin';
                     return (
                       <TouchableOpacity
                         key={key}
-                        style={[styles.chip, granted ? styles.chipGranted : styles.chipDenied, locked && styles.chipLocked]}
-                        onPress={() => !locked && togglePermission(user.id, key)}
-                        activeOpacity={locked ? 1 : 0.7}
-                      >
-                        <Text style={[styles.chipText, granted ? styles.chipTextGranted : styles.chipTextDenied]}>
+                        style={[
+                          styles.chip,
+                          granted ? styles.chipGranted : styles.chipDenied,
+                          locked && styles.chipLocked,
+                        ]}
+                        onPress={() =>
+                          !locked && togglePermission(user.id, key)
+                        }
+                        activeOpacity={locked ? 1 : 0.7}>
+                        <Text
+                          style={[
+                            styles.chipText,
+                            granted
+                              ? styles.chipTextGranted
+                              : styles.chipTextDenied,
+                          ]}>
                           {label}
                         </Text>
                       </TouchableOpacity>
@@ -191,8 +238,15 @@ function Admin(): ReactElement {
         </ScrollView>
       )}
 
-      <Modal visible={showAddModal} transparent animationType="fade" onRequestClose={() => setShowAddModal(false)}>
-        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setShowAddModal(false)}>
+      <Modal
+        visible={showAddModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowAddModal(false)}>
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={() => setShowAddModal(false)}>
           <TouchableOpacity style={styles.modal} activeOpacity={1}>
             <Text style={styles.modalTitle}>Add User</Text>
             <TextInput
@@ -213,18 +267,24 @@ function Admin(): ReactElement {
               secureTextEntry
             />
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowAddModal(false)}>
+              <TouchableOpacity
+                style={styles.cancelBtn}
+                onPress={() => setShowAddModal(false)}>
                 <Text style={styles.cancelBtnText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.createBtn, (!newUsername.trim() || !newPassword) && styles.createBtnDisabled]}
+                style={[
+                  styles.createBtn,
+                  (!newUsername.trim() || !newPassword) &&
+                    styles.createBtnDisabled,
+                ]}
                 onPress={handleAddUser}
-                disabled={adding || !newUsername.trim() || !newPassword}
-              >
-                {adding
-                  ? <ActivityIndicator size="small" color={COLORS.surface} />
-                  : <Text style={styles.createBtnText}>Create</Text>
-                }
+                disabled={adding || !newUsername.trim() || !newPassword}>
+                {adding ? (
+                  <ActivityIndicator size="small" color={COLORS.surface} />
+                ) : (
+                  <Text style={styles.createBtnText}>Create</Text>
+                )}
               </TouchableOpacity>
             </View>
           </TouchableOpacity>

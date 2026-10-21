@@ -1,16 +1,37 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {
-  View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, SafeAreaView,
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
-import useDevices, { DeviceWithStatus } from '../../hooks/useDevices.hook';
-import { COLORS, SHADOWS, SPACING, RADIUS } from '../../lib/theme';
+import {useNavigation} from '@react-navigation/native';
+import useDevices, {DeviceWithStatus} from '../../hooks/useDevices.hook';
+import {COLORS, SHADOWS, SPACING, RADIUS} from '../../lib/theme';
 
 const STATUS_CONFIG = {
-  online: { color: COLORS.success, bg: COLORS.successLight, icon: 'check-circle', label: 'Online' },
-  offline: { color: COLORS.error, bg: COLORS.errorLight, icon: 'close-circle', label: 'Offline' },
-  checking: { color: COLORS.textMuted, bg: COLORS.divider, icon: 'help-circle', label: 'Checking' },
+  online: {
+    color: COLORS.success,
+    bg: COLORS.successLight,
+    icon: 'check-circle',
+    label: 'Online',
+  },
+  offline: {
+    color: COLORS.error,
+    bg: COLORS.errorLight,
+    icon: 'close-circle',
+    label: 'Offline',
+  },
+  checking: {
+    color: COLORS.textMuted,
+    bg: COLORS.divider,
+    icon: 'help-circle',
+    label: 'Checking',
+  },
 } as const;
 
 const formatResponseTime = (ms?: number) =>
@@ -24,20 +45,22 @@ const formatLastChecked = (date: Date | null) => {
   return `${Math.floor(diff / 60)}m ago`;
 };
 
-const DeviceCard = ({ device }: { device: DeviceWithStatus }) => {
+const DeviceCard = ({device}: {device: DeviceWithStatus}) => {
   const cfg = STATUS_CONFIG[device.status];
   return (
     <View style={styles.card}>
-      <View style={[styles.statusStripe, { backgroundColor: cfg.color }]} />
+      <View style={[styles.statusStripe, {backgroundColor: cfg.color}]} />
       <View style={styles.cardBody}>
         <View style={styles.cardTop}>
           <View style={styles.cardInfo}>
             <Text style={styles.deviceName}>{device.name}</Text>
             <Text style={styles.deviceDesc}>{device.description}</Text>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: cfg.bg }]}>
+          <View style={[styles.statusBadge, {backgroundColor: cfg.bg}]}>
             <Icon name={cfg.icon} size={14} color={cfg.color} />
-            <Text style={[styles.statusLabel, { color: cfg.color }]}>{cfg.label}</Text>
+            <Text style={[styles.statusLabel, {color: cfg.color}]}>
+              {cfg.label}
+            </Text>
           </View>
         </View>
         <View style={styles.cardFooter}>
@@ -57,10 +80,14 @@ const DeviceCard = ({ device }: { device: DeviceWithStatus }) => {
 
 function Devices() {
   const navigation = useNavigation();
-  const { devices, fetchDevices, checkConnectivity, loading } = useDevices();
+  const {devices, fetchDevices, checkConnectivity, loading} = useDevices();
 
-  useEffect(() => { fetchDevices(); }, []);
-  useEffect(() => { if (devices.length > 0) checkConnectivity(); }, [devices.length]);
+  useEffect(() => {
+    fetchDevices();
+  }, []);
+  useEffect(() => {
+    if (devices.length > 0) checkConnectivity();
+  }, [devices.length]);
 
   const onlineCount = devices.filter(d => d.status === 'online').length;
 
@@ -71,61 +98,93 @@ function Devices() {
           <Icon name="access-point-network" size={22} color={COLORS.primary} />
         </View>
         <Text style={styles.headerTitle}>Devices</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.homeBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.homeBtn}
+          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
           <Icon name="home-outline" size={24} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Summary bar */}
-      <View style={styles.summaryBar}>
-        <View style={styles.summaryItem}>
-          <Text style={styles.summaryValue}>{devices.length}</Text>
-          <Text style={styles.summaryLabel}>Devices</Text>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}>
+        {/* Summary bar */}
+        <View style={styles.summaryBar}>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>{devices.length}</Text>
+            <Text style={styles.summaryLabel}>Devices</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={[styles.summaryValue, {color: COLORS.success}]}>
+              {onlineCount}
+            </Text>
+            <Text style={styles.summaryLabel}>Online</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text
+              style={[
+                styles.summaryValue,
+                {
+                  color:
+                    devices.length - onlineCount > 0
+                      ? COLORS.error
+                      : COLORS.textMuted,
+                },
+              ]}>
+              {devices.length - onlineCount}
+            </Text>
+            <Text style={styles.summaryLabel}>Offline</Text>
+          </View>
         </View>
-        <View style={styles.summaryDivider} />
-        <View style={styles.summaryItem}>
-          <Text style={[styles.summaryValue, { color: COLORS.success }]}>{onlineCount}</Text>
-          <Text style={styles.summaryLabel}>Online</Text>
+
+        {/* Actions */}
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={fetchDevices}
+            disabled={loading}>
+            <Icon name="download-outline" size={16} color={COLORS.primary} />
+            <Text style={styles.actionText}>Refresh List</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionBtn, styles.actionBtnPrimary]}
+            onPress={checkConnectivity}
+            disabled={loading || devices.length === 0}>
+            <Icon
+              name="access-point-network"
+              size={16}
+              color={COLORS.surface}
+            />
+            <Text style={[styles.actionText, {color: COLORS.surface}]}>
+              Check Connectivity
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.summaryDivider} />
-        <View style={styles.summaryItem}>
-          <Text style={[styles.summaryValue, { color: devices.length - onlineCount > 0 ? COLORS.error : COLORS.textMuted }]}>
-            {devices.length - onlineCount}
-          </Text>
-          <Text style={styles.summaryLabel}>Offline</Text>
-        </View>
-      </View>
 
-      {/* Actions */}
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.actionBtn} onPress={fetchDevices} disabled={loading}>
-          <Icon name="download-outline" size={16} color={COLORS.primary} />
-          <Text style={styles.actionText}>Refresh List</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionBtn, styles.actionBtnPrimary]}
-          onPress={checkConnectivity}
-          disabled={loading || devices.length === 0}
-        >
-          <Icon name="access-point-network" size={16} color={COLORS.surface} />
-          <Text style={[styles.actionText, { color: COLORS.surface }]}>Check Connectivity</Text>
-        </TouchableOpacity>
-      </View>
+        {loading && (
+          <ActivityIndicator
+            size="large"
+            color={COLORS.primary}
+            style={styles.loader}
+          />
+        )}
 
-      {loading && <ActivityIndicator size="large" color={COLORS.primary} style={styles.loader} />}
+        {!loading && devices.length === 0 && (
+          <View style={styles.emptyState}>
+            <Icon name="devices" size={52} color={COLORS.textMuted} />
+            <Text style={styles.emptyTitle}>No devices registered</Text>
+            <Text style={styles.emptySub}>
+              Devices will appear here once registered in the API
+            </Text>
+          </View>
+        )}
 
-      {!loading && devices.length === 0 && (
-        <View style={styles.emptyState}>
-          <Icon name="devices" size={52} color={COLORS.textMuted} />
-          <Text style={styles.emptyTitle}>No devices registered</Text>
-          <Text style={styles.emptySub}>Devices will appear here once registered in the API</Text>
-        </View>
-      )}
-
-      {devices.map(device => (
-        <DeviceCard key={device.id} device={device} />
-      ))}
-    </ScrollView>
+        {devices.map(device => (
+          <DeviceCard key={device.id} device={device} />
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 }

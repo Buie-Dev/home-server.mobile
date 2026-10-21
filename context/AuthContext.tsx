@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { loginRequest, fetchMyPermissions } from '../api/auth.api';
-import { setUnauthorizedHandler } from '../api/base.api';
-import { clearToken, getToken, setToken } from '../lib/tokenStorage';
+import React, {createContext, useContext, useEffect, useState} from 'react';
+import {loginRequest, fetchMyPermissions} from '../api/auth.api';
+import {setUnauthorizedHandler} from '../api/base.api';
+import {clearToken, getToken, setToken} from '../lib/tokenStorage';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -15,7 +15,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<number | null>(null);
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setUnauthorizedHandler(logout);
 
-    getToken().then(async (token) => {
+    getToken().then(async token => {
       if (token) {
         setIsAuthenticated(true);
         await loadPermissions();
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (username: string, password: string) => {
-    const { token } = await loginRequest(username, password);
+    const {token} = await loginRequest(username, password);
     await setToken(token);
     setIsAuthenticated(true);
     await loadPermissions();
@@ -60,7 +60,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const hasPermission = (page: string): boolean => permissions.includes(page);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, userId, permissions, hasPermission, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        isLoading,
+        userId,
+        permissions,
+        hasPermission,
+        login,
+        logout,
+      }}>
       {children}
     </AuthContext.Provider>
   );

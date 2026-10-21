@@ -1,5 +1,5 @@
-import { get, post, put, del } from './base.api';
-import { ROWING } from './apiRoutes';
+import {get, post, put, del} from './base.api';
+import {ROWING} from './apiRoutes';
 
 export type Gender = 'Men' | 'Women' | 'Mixed';
 export type AgeCategory = 'U15' | 'U17' | 'U19' | 'U23' | 'Open';
@@ -112,63 +112,202 @@ export const fetchBoatClasses = (): Promise<BoatClass[]> =>
 export const fetchCrewMembers = (): Promise<CrewMember[]> =>
   get(`${ROWING}/crew`);
 
-export const createCrewMember = ({ name, gender }: { name: string; gender: string }): Promise<{ id: number }> =>
-  post(`${ROWING}/crew`, { name, gender });
+export const createCrewMember = ({
+  name,
+  gender,
+}: {
+  name: string;
+  gender: string;
+}): Promise<{id: number}> => post(`${ROWING}/crew`, {name, gender});
 
-export const deleteCrewMember = ({ id }: { id: number }): Promise<{ success: boolean }> =>
-  del(`${ROWING}/crew/${id}`);
+export const deleteCrewMember = ({
+  id,
+}: {
+  id: number;
+}): Promise<{success: boolean}> => del(`${ROWING}/crew/${id}`);
 
-export const fetchBoats = (): Promise<Boat[]> =>
-  get(`${ROWING}/boats`);
+export const fetchBoats = (): Promise<Boat[]> => get(`${ROWING}/boats`);
 
-export const createBoat = ({ name, boatClassId }: { name: string; boatClassId?: number }): Promise<{ id: number }> =>
-  post(`${ROWING}/boats`, { name, boatClassId });
+export const createBoat = ({
+  name,
+  boatClassId,
+}: {
+  name: string;
+  boatClassId?: number;
+}): Promise<{id: number}> => post(`${ROWING}/boats`, {name, boatClassId});
 
-export const deleteBoat = ({ id }: { id: number }): Promise<{ success: boolean }> =>
+export const deleteBoat = ({id}: {id: number}): Promise<{success: boolean}> =>
   del(`${ROWING}/boats/${id}`);
 
-export const fetchCrews = (): Promise<Crew[]> =>
-  get(`${ROWING}/crews`);
+export const fetchCrews = (): Promise<Crew[]> => get(`${ROWING}/crews`);
 
-export const createCrew = ({ boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 }: { boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats): Promise<{ id: number }> =>
-  post(`${ROWING}/crews`, { boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 });
+export const createCrew = ({
+  boatId,
+  gender,
+  ageCategory,
+  cox,
+  seat1,
+  seat2,
+  seat3,
+  seat4,
+  seat5,
+  seat6,
+  seat7,
+  seat8,
+}: {
+  boatId: number;
+  gender: Gender;
+  ageCategory: AgeCategory;
+} & CrewSeats): Promise<{id: number}> =>
+  post(`${ROWING}/crews`, {
+    boatId,
+    gender,
+    ageCategory,
+    cox,
+    seat1,
+    seat2,
+    seat3,
+    seat4,
+    seat5,
+    seat6,
+    seat7,
+    seat8,
+  });
 
-export const updateCrew = ({ id, boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 }: { id: number; boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats): Promise<{ id: number; copied: boolean }> =>
-  put(`${ROWING}/crews/${id}`, { boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 });
+export const updateCrew = ({
+  id,
+  boatId,
+  gender,
+  ageCategory,
+  cox,
+  seat1,
+  seat2,
+  seat3,
+  seat4,
+  seat5,
+  seat6,
+  seat7,
+  seat8,
+}: {
+  id: number;
+  boatId: number;
+  gender: Gender;
+  ageCategory: AgeCategory;
+} & CrewSeats): Promise<{id: number; copied: boolean}> =>
+  put(`${ROWING}/crews/${id}`, {
+    boatId,
+    gender,
+    ageCategory,
+    cox,
+    seat1,
+    seat2,
+    seat3,
+    seat4,
+    seat5,
+    seat6,
+    seat7,
+    seat8,
+  });
 
-export const updateCrewLineup = ({ id, boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 }: { id: number; boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats): Promise<{ success: boolean }> =>
-  put(`${ROWING}/crews/${id}/lineup`, { boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 });
+export const updateCrewLineup = ({
+  id,
+  boatId,
+  gender,
+  ageCategory,
+  cox,
+  seat1,
+  seat2,
+  seat3,
+  seat4,
+  seat5,
+  seat6,
+  seat7,
+  seat8,
+}: {
+  id: number;
+  boatId: number;
+  gender: Gender;
+  ageCategory: AgeCategory;
+} & CrewSeats): Promise<{success: boolean}> =>
+  put(`${ROWING}/crews/${id}/lineup`, {
+    boatId,
+    gender,
+    ageCategory,
+    cox,
+    seat1,
+    seat2,
+    seat3,
+    seat4,
+    seat5,
+    seat6,
+    seat7,
+    seat8,
+  });
 
-export const deleteCrew = ({ id }: { id: number }): Promise<{ success: boolean }> =>
+export const deleteCrew = ({id}: {id: number}): Promise<{success: boolean}> =>
   del(`${ROWING}/crews/${id}`);
 
-export const fetchRaces = ({ date }: { date: string }): Promise<Race[]> =>
-  get(`${ROWING}/races`, { date });
+export const fetchRaces = ({date}: {date: string}): Promise<Race[]> =>
+  get(`${ROWING}/races`, {date});
 
-export const fetchRace = ({ id }: { id: number }): Promise<Race> =>
+export const fetchRace = ({id}: {id: number}): Promise<Race> =>
   get(`${ROWING}/races/${id}`);
 
-export const createRace = ({ distance, raceType, crewIds, windConditions, notes }: { distance: string; raceType: RaceType; crewIds: number[]; windConditions?: string; notes?: string }): Promise<{ id: number }> =>
-  post(`${ROWING}/races`, { distance, raceType, crewIds, windConditions, notes });
+export const createRace = ({
+  distance,
+  raceType,
+  crewIds,
+  windConditions,
+  notes,
+}: {
+  distance: string;
+  raceType: RaceType;
+  crewIds: number[];
+  windConditions?: string;
+  notes?: string;
+}): Promise<{id: number}> =>
+  post(`${ROWING}/races`, {distance, raceType, crewIds, windConditions, notes});
 
-export const completeRace = ({ id }: { id: number }): Promise<{ success: boolean }> =>
+export const completeRace = ({id}: {id: number}): Promise<{success: boolean}> =>
   post(`${ROWING}/races/${id}/complete`);
 
-export const deleteRace = ({ id }: { id: number }): Promise<{ success: boolean }> =>
+export const deleteRace = ({id}: {id: number}): Promise<{success: boolean}> =>
   del(`${ROWING}/races/${id}`);
 
-export const recordEntryStart = ({ entryId, startTime }: { entryId: number; startTime: number }): Promise<{ success: boolean }> =>
-  post(`${ROWING}/entries/${entryId}/start`, { startTime });
+export const recordEntryStart = ({
+  entryId,
+  startTime,
+}: {
+  entryId: number;
+  startTime: number;
+}): Promise<{success: boolean}> =>
+  post(`${ROWING}/entries/${entryId}/start`, {startTime});
 
-export const recordEntryFinish = ({ entryId, finishTime, elapsedMs }: { entryId: number; finishTime: number; elapsedMs: number }): Promise<{ success: boolean }> =>
-  post(`${ROWING}/entries/${entryId}/finish`, { finishTime, elapsedMs });
+export const recordEntryFinish = ({
+  entryId,
+  finishTime,
+  elapsedMs,
+}: {
+  entryId: number;
+  finishTime: number;
+  elapsedMs: number;
+}): Promise<{success: boolean}> =>
+  post(`${ROWING}/entries/${entryId}/finish`, {finishTime, elapsedMs});
 
-export const markEntryDns = ({ entryId }: { entryId: number }): Promise<{ success: boolean }> =>
-  post(`${ROWING}/entries/${entryId}/dns`);
+export const markEntryDns = ({
+  entryId,
+}: {
+  entryId: number;
+}): Promise<{success: boolean}> => post(`${ROWING}/entries/${entryId}/dns`);
 
-export const markEntryDnf = ({ entryId }: { entryId: number }): Promise<{ success: boolean }> =>
-  post(`${ROWING}/entries/${entryId}/dnf`);
+export const markEntryDnf = ({
+  entryId,
+}: {
+  entryId: number;
+}): Promise<{success: boolean}> => post(`${ROWING}/entries/${entryId}/dnf`);
 
-export const deleteEntry = ({ entryId }: { entryId: number }): Promise<{ success: boolean }> =>
-  del(`${ROWING}/entries/${entryId}`);
-
+export const deleteEntry = ({
+  entryId,
+}: {
+  entryId: number;
+}): Promise<{success: boolean}> => del(`${ROWING}/entries/${entryId}`);

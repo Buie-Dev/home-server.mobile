@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -10,11 +10,11 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useAuth } from '../context/AuthContext';
-import { COLORS, RADIUS, SHADOWS, SPACING } from '../lib/theme';
+import {useAuth} from '../context/AuthContext';
+import {COLORS, RADIUS, SHADOWS, SPACING} from '../lib/theme';
 
 const Login = () => {
-  const { login } = useAuth();
+  const {login} = useAuth();
   const [username, setUsername] = useState('Dandelion');
   const [password, setPassword] = useState('2128Garden');
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,12 @@ const Login = () => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.card}>
-        <Icon name="water" size={48} color={COLORS.primary} style={styles.icon} />
+        <Icon
+          name="water"
+          size={48}
+          color={COLORS.primary}
+          style={styles.icon}
+        />
         <Text style={styles.title}>Home</Text>
         <Text style={styles.subtitle}>Sign in to continue</Text>
 

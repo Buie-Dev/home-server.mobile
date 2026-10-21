@@ -1,18 +1,24 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, StyleSheet, SafeAreaView, Text, TouchableOpacity } from 'react-native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import Zones from '../../screens/irrigation/Zones';
 import Schedules from '../../screens/irrigation/Schedules';
 import Queue from '../../screens/irrigation/Queue';
 import History from '../../screens/irrigation/History';
 import useIrrigation from '../../hooks/useIrrigation.hook';
-import { COLORS } from '../../lib/theme';
+import {COLORS} from '../../lib/theme';
 
 const Tab = createBottomTabNavigator();
 
-const PageHeader = ({ title, icon }: { title: string; icon: string }) => {
+const PageHeader = ({title, icon}: {title: string; icon: string}) => {
   const navigation = useNavigation();
   return (
     <View style={styles.header}>
@@ -20,7 +26,10 @@ const PageHeader = ({ title, icon }: { title: string; icon: string }) => {
         <Icon name={icon} size={22} color={COLORS.primary} />
       </View>
       <Text style={styles.headerTitle}>{title}</Text>
-      <TouchableOpacity onPress={() => navigation.getParent()?.goBack()} style={styles.homeBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+      <TouchableOpacity
+        onPress={() => navigation.getParent()?.goBack()}
+        style={styles.homeBtn}
+        hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
         <Icon name="home-outline" size={24} color={COLORS.primary} />
       </TouchableOpacity>
     </View>
@@ -35,33 +44,42 @@ const TAB_ICONS: Record<string, string> = {
 };
 
 const IrrigationPage = () => {
-  const { priorityQueue } = useIrrigation();
+  const {priorityQueue} = useIrrigation();
 
   return (
     <SafeAreaView style={styles.container}>
       <Tab.Navigator
-          screenOptions={({ route }) => ({
-            header: () => <PageHeader title={route.name} icon={TAB_ICONS[route.name] ?? 'circle'} />,
-            tabBarIcon: ({ color, size }) => (
-              <Icon name={TAB_ICONS[route.name] ?? 'circle'} size={size} color={color} />
-            ),
-            tabBarActiveTintColor: COLORS.primary,
-            tabBarInactiveTintColor: COLORS.textMuted,
-            tabBarStyle: styles.tabBar,
-            tabBarLabelStyle: styles.tabLabel,
-          })}
-        >
-          <Tab.Screen name="Zones" component={Zones} />
-          <Tab.Screen name="Schedules" component={Schedules} />
-          <Tab.Screen
-            name="Live"
-            component={Queue}
-            options={{
-              tabBarBadge: priorityQueue.length > 0 ? priorityQueue.length : undefined,
-            }}
-          />
-          <Tab.Screen name="History" component={History} />
-        </Tab.Navigator>
+        screenOptions={({route}) => ({
+          header: () => (
+            <PageHeader
+              title={route.name}
+              icon={TAB_ICONS[route.name] ?? 'circle'}
+            />
+          ),
+          tabBarIcon: ({color, size}) => (
+            <Icon
+              name={TAB_ICONS[route.name] ?? 'circle'}
+              size={size}
+              color={color}
+            />
+          ),
+          tabBarActiveTintColor: COLORS.primary,
+          tabBarInactiveTintColor: COLORS.textMuted,
+          tabBarStyle: styles.tabBar,
+          tabBarLabelStyle: styles.tabLabel,
+        })}>
+        <Tab.Screen name="Zones" component={Zones} />
+        <Tab.Screen name="Schedules" component={Schedules} />
+        <Tab.Screen
+          name="Live"
+          component={Queue}
+          options={{
+            tabBarBadge:
+              priorityQueue.length > 0 ? priorityQueue.length : undefined,
+          }}
+        />
+        <Tab.Screen name="History" component={History} />
+      </Tab.Navigator>
     </SafeAreaView>
   );
 };

@@ -1,13 +1,40 @@
-import { useCallback, useState } from 'react';
+import {useCallback, useState} from 'react';
 import {
-  fetchBoatClasses, fetchCrewMembers, createCrewMember, deleteCrewMember,
-  fetchBoats, createBoat, deleteBoat,
-  fetchCrews, createCrew, updateCrew, updateCrewLineup, deleteCrew,
-  fetchRaces, fetchRace, createRace, completeRace, deleteRace,
-  recordEntryStart, recordEntryFinish, markEntryDns, markEntryDnf, deleteEntry,
+  fetchBoatClasses,
+  fetchCrewMembers,
+  createCrewMember,
+  deleteCrewMember,
+  fetchBoats,
+  createBoat,
+  deleteBoat,
+  fetchCrews,
+  createCrew,
+  updateCrew,
+  updateCrewLineup,
+  deleteCrew,
+  fetchRaces,
+  fetchRace,
+  createRace,
+  completeRace,
+  deleteRace,
+  recordEntryStart,
+  recordEntryFinish,
+  markEntryDns,
+  markEntryDnf,
+  deleteEntry,
 } from '../api/rowing.api';
-import type { BoatClass, Boat, Crew, CrewMember, CrewSeats, Race, RaceType, Gender, AgeCategory } from '../api/rowing.api';
-import { useWebSocket, WEBSOCKET_TOPICS } from '../context/WebSocketContext';
+import type {
+  BoatClass,
+  Boat,
+  Crew,
+  CrewMember,
+  CrewSeats,
+  Race,
+  RaceType,
+  Gender,
+  AgeCategory,
+} from '../api/rowing.api';
+import {useWebSocket, WEBSOCKET_TOPICS} from '../context/WebSocketContext';
 
 type UseRowingReturn = {
   boatClasses: BoatClass[];
@@ -20,30 +47,107 @@ type UseRowingReturn = {
   error: string | null;
   fetchAllBoatClasses: () => Promise<void>;
   fetchAllCrew: () => Promise<void>;
-  addCrewMember: ({ name, gender }: { name: string; gender: string }) => Promise<void>;
-  removeCrewMember: ({ id }: { id: number }) => Promise<void>;
+  addCrewMember: ({
+    name,
+    gender,
+  }: {
+    name: string;
+    gender: string;
+  }) => Promise<void>;
+  removeCrewMember: ({id}: {id: number}) => Promise<void>;
   fetchAllBoats: () => Promise<void>;
-  addBoat: ({ name, boatClassId }: { name: string; boatClassId?: number }) => Promise<void>;
-  removeBoat: ({ id }: { id: number }) => Promise<void>;
+  addBoat: ({
+    name,
+    boatClassId,
+  }: {
+    name: string;
+    boatClassId?: number;
+  }) => Promise<void>;
+  removeBoat: ({id}: {id: number}) => Promise<void>;
   fetchAllCrews: () => Promise<void>;
-  addCrew: ({ boatId, gender, ageCategory, ...seats }: { boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats) => Promise<void>;
-  editCrew: ({ id, boatId, gender, ageCategory, ...seats }: { id: number; boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats) => Promise<{ copied: boolean }>;
-  editCrewLineup: ({ id, boatId, gender, ageCategory, ...seats }: { id: number; boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats) => Promise<void>;
-  removeCrew: ({ id }: { id: number }) => Promise<void>;
-  fetchAllRaces: ({ date }: { date: string }) => Promise<void>;
-  loadRace: ({ id }: { id: number }) => Promise<void>;
-  startRace: ({ distance, raceType, crewIds, windConditions, notes }: { distance: string; raceType: RaceType; crewIds: number[]; windConditions?: string; notes?: string }) => Promise<number>;
-  finishRace: ({ id }: { id: number }) => Promise<void>;
-  removeRace: ({ id, date }: { id: number; date: string }) => Promise<void>;
-  sendBoatStart: ({ raceId, entryId, boatName, timestamp }: { raceId: number; entryId: number; boatName: string; timestamp: number }) => Promise<void>;
-  sendBoatFinish: ({ raceId, entryId, boatName, timestamp, elapsedMs }: { raceId: number; entryId: number; boatName: string; timestamp: number; elapsedMs: number }) => Promise<void>;
-  setEntryDns: ({ entryId }: { entryId: number }) => Promise<void>;
-  setEntryDnf: ({ entryId }: { entryId: number }) => Promise<void>;
-  removeEntry: ({ entryId }: { entryId: number }) => Promise<void>;
+  addCrew: ({
+    boatId,
+    gender,
+    ageCategory,
+    ...seats
+  }: {
+    boatId: number;
+    gender: Gender;
+    ageCategory: AgeCategory;
+  } & CrewSeats) => Promise<void>;
+  editCrew: ({
+    id,
+    boatId,
+    gender,
+    ageCategory,
+    ...seats
+  }: {
+    id: number;
+    boatId: number;
+    gender: Gender;
+    ageCategory: AgeCategory;
+  } & CrewSeats) => Promise<{copied: boolean}>;
+  editCrewLineup: ({
+    id,
+    boatId,
+    gender,
+    ageCategory,
+    ...seats
+  }: {
+    id: number;
+    boatId: number;
+    gender: Gender;
+    ageCategory: AgeCategory;
+  } & CrewSeats) => Promise<void>;
+  removeCrew: ({id}: {id: number}) => Promise<void>;
+  fetchAllRaces: ({date}: {date: string}) => Promise<void>;
+  loadRace: ({id}: {id: number}) => Promise<void>;
+  startRace: ({
+    distance,
+    raceType,
+    crewIds,
+    windConditions,
+    notes,
+  }: {
+    distance: string;
+    raceType: RaceType;
+    crewIds: number[];
+    windConditions?: string;
+    notes?: string;
+  }) => Promise<number>;
+  finishRace: ({id}: {id: number}) => Promise<void>;
+  removeRace: ({id, date}: {id: number; date: string}) => Promise<void>;
+  sendBoatStart: ({
+    raceId,
+    entryId,
+    boatName,
+    timestamp,
+  }: {
+    raceId: number;
+    entryId: number;
+    boatName: string;
+    timestamp: number;
+  }) => Promise<void>;
+  sendBoatFinish: ({
+    raceId,
+    entryId,
+    boatName,
+    timestamp,
+    elapsedMs,
+  }: {
+    raceId: number;
+    entryId: number;
+    boatName: string;
+    timestamp: number;
+    elapsedMs: number;
+  }) => Promise<void>;
+  setEntryDns: ({entryId}: {entryId: number}) => Promise<void>;
+  setEntryDnf: ({entryId}: {entryId: number}) => Promise<void>;
+  removeEntry: ({entryId}: {entryId: number}) => Promise<void>;
 };
 
 export function useRowing(): UseRowingReturn {
-  const { sendMessage } = useWebSocket();
+  const {sendMessage} = useWebSocket();
   const [boatClasses, setBoatClasses] = useState<BoatClass[]>([]);
   const [crewMembers, setCrewMembers] = useState<CrewMember[]>([]);
   const [boats, setBoats] = useState<Boat[]>([]);
@@ -54,122 +158,367 @@ export function useRowing(): UseRowingReturn {
   const [error, setError] = useState<string | null>(null);
 
   const fetchAllBoatClasses = useCallback(async () => {
-    try { setBoatClasses(await fetchBoatClasses()); } catch { setError('Failed to load boat classes'); }
+    try {
+      setBoatClasses(await fetchBoatClasses());
+    } catch {
+      setError('Failed to load boat classes');
+    }
   }, []);
 
   const fetchAllCrew = useCallback(async () => {
-    try { setCrewMembers(await fetchCrewMembers()); } catch { setError('Failed to load crew members'); }
+    try {
+      setCrewMembers(await fetchCrewMembers());
+    } catch {
+      setError('Failed to load crew members');
+    }
   }, []);
 
-  const addCrewMember = useCallback(async ({ name, gender }: { name: string; gender: string }) => {
-    await createCrewMember({ name, gender });
-    await fetchAllCrew();
-  }, [fetchAllCrew]);
+  const addCrewMember = useCallback(
+    async ({name, gender}: {name: string; gender: string}) => {
+      await createCrewMember({name, gender});
+      await fetchAllCrew();
+    },
+    [fetchAllCrew],
+  );
 
-  const removeCrewMember = useCallback(async ({ id }: { id: number }) => {
-    await deleteCrewMember({ id });
-    await fetchAllCrew();
-  }, [fetchAllCrew]);
+  const removeCrewMember = useCallback(
+    async ({id}: {id: number}) => {
+      await deleteCrewMember({id});
+      await fetchAllCrew();
+    },
+    [fetchAllCrew],
+  );
 
   const fetchAllBoats = useCallback(async () => {
-    try { setBoats(await fetchBoats()); } catch { setError('Failed to load boats'); }
+    try {
+      setBoats(await fetchBoats());
+    } catch {
+      setError('Failed to load boats');
+    }
   }, []);
 
-  const addBoat = useCallback(async ({ name, boatClassId }: { name: string; boatClassId?: number }) => {
-    await createBoat({ name, boatClassId });
-    await fetchAllBoats();
-  }, [fetchAllBoats]);
+  const addBoat = useCallback(
+    async ({name, boatClassId}: {name: string; boatClassId?: number}) => {
+      await createBoat({name, boatClassId});
+      await fetchAllBoats();
+    },
+    [fetchAllBoats],
+  );
 
-  const removeBoat = useCallback(async ({ id }: { id: number }) => {
-    await deleteBoat({ id });
-    await fetchAllBoats();
-  }, [fetchAllBoats]);
+  const removeBoat = useCallback(
+    async ({id}: {id: number}) => {
+      await deleteBoat({id});
+      await fetchAllBoats();
+    },
+    [fetchAllBoats],
+  );
 
   const fetchAllCrews = useCallback(async () => {
-    try { setCrews(await fetchCrews()); } catch { setError('Failed to load crews'); }
+    try {
+      setCrews(await fetchCrews());
+    } catch {
+      setError('Failed to load crews');
+    }
   }, []);
 
-  const addCrew = useCallback(async ({ boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 }: { boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats) => {
-    await createCrew({ boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 });
-    await fetchAllCrews();
-  }, [fetchAllCrews]);
+  const addCrew = useCallback(
+    async ({
+      boatId,
+      gender,
+      ageCategory,
+      cox,
+      seat1,
+      seat2,
+      seat3,
+      seat4,
+      seat5,
+      seat6,
+      seat7,
+      seat8,
+    }: {
+      boatId: number;
+      gender: Gender;
+      ageCategory: AgeCategory;
+    } & CrewSeats) => {
+      await createCrew({
+        boatId,
+        gender,
+        ageCategory,
+        cox,
+        seat1,
+        seat2,
+        seat3,
+        seat4,
+        seat5,
+        seat6,
+        seat7,
+        seat8,
+      });
+      await fetchAllCrews();
+    },
+    [fetchAllCrews],
+  );
 
-  const editCrew = useCallback(async ({ id, boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 }: { id: number; boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats) => {
-    const result = await updateCrew({ id, boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 });
-    await fetchAllCrews();
-    return { copied: result.copied };
-  }, [fetchAllCrews]);
+  const editCrew = useCallback(
+    async ({
+      id,
+      boatId,
+      gender,
+      ageCategory,
+      cox,
+      seat1,
+      seat2,
+      seat3,
+      seat4,
+      seat5,
+      seat6,
+      seat7,
+      seat8,
+    }: {
+      id: number;
+      boatId: number;
+      gender: Gender;
+      ageCategory: AgeCategory;
+    } & CrewSeats) => {
+      const result = await updateCrew({
+        id,
+        boatId,
+        gender,
+        ageCategory,
+        cox,
+        seat1,
+        seat2,
+        seat3,
+        seat4,
+        seat5,
+        seat6,
+        seat7,
+        seat8,
+      });
+      await fetchAllCrews();
+      return {copied: result.copied};
+    },
+    [fetchAllCrews],
+  );
 
-  const editCrewLineup = useCallback(async ({ id, boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 }: { id: number; boatId: number; gender: Gender; ageCategory: AgeCategory } & CrewSeats) => {
-    await updateCrewLineup({ id, boatId, gender, ageCategory, cox, seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8 });
-    await fetchAllCrews();
-    if (activeRace) await loadRace({ id: activeRace.id });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchAllCrews, activeRace]);
+  const editCrewLineup = useCallback(
+    async ({
+      id,
+      boatId,
+      gender,
+      ageCategory,
+      cox,
+      seat1,
+      seat2,
+      seat3,
+      seat4,
+      seat5,
+      seat6,
+      seat7,
+      seat8,
+    }: {
+      id: number;
+      boatId: number;
+      gender: Gender;
+      ageCategory: AgeCategory;
+    } & CrewSeats) => {
+      await updateCrewLineup({
+        id,
+        boatId,
+        gender,
+        ageCategory,
+        cox,
+        seat1,
+        seat2,
+        seat3,
+        seat4,
+        seat5,
+        seat6,
+        seat7,
+        seat8,
+      });
+      await fetchAllCrews();
+      if (activeRace) await loadRace({id: activeRace.id});
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [fetchAllCrews, activeRace],
+  );
 
-  const removeCrew = useCallback(async ({ id }: { id: number }) => {
-    await deleteCrew({ id });
-    await fetchAllCrews();
-  }, [fetchAllCrews]);
+  const removeCrew = useCallback(
+    async ({id}: {id: number}) => {
+      await deleteCrew({id});
+      await fetchAllCrews();
+    },
+    [fetchAllCrews],
+  );
 
-  const fetchAllRaces = useCallback(async ({ date }: { date: string }) => {
+  const fetchAllRaces = useCallback(async ({date}: {date: string}) => {
     setIsLoading(true);
     setError(null);
-    try { setRaces(await fetchRaces({ date })); } catch { setError('Failed to load races'); } finally { setIsLoading(false); }
+    try {
+      setRaces(await fetchRaces({date}));
+    } catch {
+      setError('Failed to load races');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const loadRace = useCallback(async ({ id }: { id: number }) => {
-    try { setActiveRace(await fetchRace({ id })); } catch { setError('Failed to load race'); }
+  const loadRace = useCallback(async ({id}: {id: number}) => {
+    try {
+      setActiveRace(await fetchRace({id}));
+    } catch {
+      setError('Failed to load race');
+    }
   }, []);
 
-  const startRace = useCallback(async ({ distance, raceType, crewIds, windConditions, notes }: { distance: string; raceType: RaceType; crewIds: number[]; windConditions?: string; notes?: string }) => {
-    const { id } = await createRace({ distance, raceType, crewIds, windConditions, notes });
-    return id;
-  }, []);
+  const startRace = useCallback(
+    async ({
+      distance,
+      raceType,
+      crewIds,
+      windConditions,
+      notes,
+    }: {
+      distance: string;
+      raceType: RaceType;
+      crewIds: number[];
+      windConditions?: string;
+      notes?: string;
+    }) => {
+      const {id} = await createRace({
+        distance,
+        raceType,
+        crewIds,
+        windConditions,
+        notes,
+      });
+      return id;
+    },
+    [],
+  );
 
-  const finishRace = useCallback(async ({ id }: { id: number }) => {
-    await completeRace({ id });
-    await loadRace({ id });
-  }, [loadRace]);
+  const finishRace = useCallback(
+    async ({id}: {id: number}) => {
+      await completeRace({id});
+      await loadRace({id});
+    },
+    [loadRace],
+  );
 
-  const removeRace = useCallback(async ({ id, date }: { id: number; date: string }) => {
-    await deleteRace({ id });
-    await fetchAllRaces({ date });
-  }, [fetchAllRaces]);
+  const removeRace = useCallback(
+    async ({id, date}: {id: number; date: string}) => {
+      await deleteRace({id});
+      await fetchAllRaces({date});
+    },
+    [fetchAllRaces],
+  );
 
-  const sendBoatStart = useCallback(async ({ raceId, entryId, boatName, timestamp }: { raceId: number; entryId: number; boatName: string; timestamp: number }) => {
-    await recordEntryStart({ entryId, startTime: timestamp });
-    sendMessage(WEBSOCKET_TOPICS.ROWING_START, { raceId, entryId, boatName, timestamp });
-    if (activeRace) await loadRace({ id: raceId });
-  }, [sendMessage, activeRace, loadRace]);
+  const sendBoatStart = useCallback(
+    async ({
+      raceId,
+      entryId,
+      boatName,
+      timestamp,
+    }: {
+      raceId: number;
+      entryId: number;
+      boatName: string;
+      timestamp: number;
+    }) => {
+      await recordEntryStart({entryId, startTime: timestamp});
+      sendMessage(WEBSOCKET_TOPICS.ROWING_START, {
+        raceId,
+        entryId,
+        boatName,
+        timestamp,
+      });
+      if (activeRace) await loadRace({id: raceId});
+    },
+    [sendMessage, activeRace, loadRace],
+  );
 
-  const sendBoatFinish = useCallback(async ({ raceId, entryId, boatName, timestamp, elapsedMs }: { raceId: number; entryId: number; boatName: string; timestamp: number; elapsedMs: number }) => {
-    await recordEntryFinish({ entryId, finishTime: timestamp, elapsedMs });
-    sendMessage(WEBSOCKET_TOPICS.ROWING_FINISH, { raceId, entryId, boatName, timestamp, elapsedMs });
-    if (activeRace) await loadRace({ id: raceId });
-  }, [sendMessage, activeRace, loadRace]);
+  const sendBoatFinish = useCallback(
+    async ({
+      raceId,
+      entryId,
+      boatName,
+      timestamp,
+      elapsedMs,
+    }: {
+      raceId: number;
+      entryId: number;
+      boatName: string;
+      timestamp: number;
+      elapsedMs: number;
+    }) => {
+      await recordEntryFinish({entryId, finishTime: timestamp, elapsedMs});
+      sendMessage(WEBSOCKET_TOPICS.ROWING_FINISH, {
+        raceId,
+        entryId,
+        boatName,
+        timestamp,
+        elapsedMs,
+      });
+      if (activeRace) await loadRace({id: raceId});
+    },
+    [sendMessage, activeRace, loadRace],
+  );
 
-  const setEntryDns = useCallback(async ({ entryId }: { entryId: number }) => {
-    await markEntryDns({ entryId });
-    if (activeRace) await loadRace({ id: activeRace.id });
-  }, [activeRace, loadRace]);
+  const setEntryDns = useCallback(
+    async ({entryId}: {entryId: number}) => {
+      await markEntryDns({entryId});
+      if (activeRace) await loadRace({id: activeRace.id});
+    },
+    [activeRace, loadRace],
+  );
 
-  const setEntryDnf = useCallback(async ({ entryId }: { entryId: number }) => {
-    await markEntryDnf({ entryId });
-    if (activeRace) await loadRace({ id: activeRace.id });
-  }, [activeRace, loadRace]);
+  const setEntryDnf = useCallback(
+    async ({entryId}: {entryId: number}) => {
+      await markEntryDnf({entryId});
+      if (activeRace) await loadRace({id: activeRace.id});
+    },
+    [activeRace, loadRace],
+  );
 
-  const removeEntry = useCallback(async ({ entryId }: { entryId: number }) => {
-    await deleteEntry({ entryId });
-    if (activeRace) await loadRace({ id: activeRace.id });
-  }, [activeRace, loadRace]);
+  const removeEntry = useCallback(
+    async ({entryId}: {entryId: number}) => {
+      await deleteEntry({entryId});
+      if (activeRace) await loadRace({id: activeRace.id});
+    },
+    [activeRace, loadRace],
+  );
 
   return {
-    boatClasses, crewMembers, boats, crews, races, activeRace, isLoading, error,
-    fetchAllBoatClasses, fetchAllCrew, addCrewMember, removeCrewMember,
-    fetchAllBoats, addBoat, removeBoat,
-    fetchAllCrews, addCrew, editCrew, editCrewLineup, removeCrew,
-    fetchAllRaces, loadRace, startRace, finishRace, removeRace,
-    sendBoatStart, sendBoatFinish, setEntryDns, setEntryDnf, removeEntry,
+    boatClasses,
+    crewMembers,
+    boats,
+    crews,
+    races,
+    activeRace,
+    isLoading,
+    error,
+    fetchAllBoatClasses,
+    fetchAllCrew,
+    addCrewMember,
+    removeCrewMember,
+    fetchAllBoats,
+    addBoat,
+    removeBoat,
+    fetchAllCrews,
+    addCrew,
+    editCrew,
+    editCrewLineup,
+    removeCrew,
+    fetchAllRaces,
+    loadRace,
+    startRace,
+    finishRace,
+    removeRace,
+    sendBoatStart,
+    sendBoatFinish,
+    setEntryDns,
+    setEntryDnf,
+    removeEntry,
   };
 }

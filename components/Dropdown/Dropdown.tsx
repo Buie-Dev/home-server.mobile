@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Modal, Pressable, Dimensions } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Modal,
+  Pressable,
+  Dimensions,
+} from 'react-native';
 
 export interface DropdownItem {
   id: string;
@@ -25,14 +33,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
   labelStyle,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+  const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
   return (
     <View style={[styles.container, style]}>
       <TouchableOpacity
         onPress={() => setIsOpen(!isOpen)}
-        style={[styles.trigger, triggerStyle]}
-      >
+        style={[styles.trigger, triggerStyle]}>
         <Text style={[styles.triggerText, labelStyle]}>{label}</Text>
         <View style={styles.arrowContainer}>
           <Text style={styles.arrow}>▼</Text>
@@ -43,23 +50,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
         visible={isOpen}
         transparent
         animationType="fade"
-        onRequestClose={() => setIsOpen(false)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setIsOpen(false)}
-        >
+        onRequestClose={() => setIsOpen(false)}>
+        <Pressable style={styles.modalOverlay} onPress={() => setIsOpen(false)}>
           <View style={styles.menuContainer}>
             <View style={styles.menu}>
-              {items.map((item) => (
+              {items.map(item => (
                 <TouchableOpacity
                   key={item.id}
                   style={styles.menuItem}
                   onPress={() => {
                     item.onPress?.();
                     setIsOpen(false);
-                  }}
-                >
+                  }}>
                   <Text style={styles.menuItemText}>{item.label}</Text>
                 </TouchableOpacity>
               ))}

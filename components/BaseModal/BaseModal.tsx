@@ -1,11 +1,17 @@
-import React, { ReactElement, ReactNode } from 'react';
+import React, {ReactElement, ReactNode} from 'react';
 import {
-  KeyboardAvoidingView, Modal, Platform, SafeAreaView,
-  StyleSheet, Text, TouchableOpacity, View,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS, RADIUS, SHADOWS, SPACING } from '../../lib/theme';
-import Button, { BUTTON_STYLE } from '../Button/Button';
+import {COLORS, RADIUS, SHADOWS, SPACING} from '../../lib/theme';
+import Button, {BUTTON_STYLE} from '../Button/Button';
 
 interface BaseModalProps {
   open: boolean;
@@ -19,10 +25,15 @@ interface BaseModalProps {
 }
 
 function BaseModal({
-  open, title, children, onClose, onAction,
-  actionTitle = 'Save', actionStyle = BUTTON_STYLE.SOLID, fullScreen = false,
+  open,
+  title,
+  children,
+  onClose,
+  onAction,
+  actionTitle = 'Save',
+  actionStyle = BUTTON_STYLE.SOLID,
+  fullScreen = false,
 }: BaseModalProps): ReactElement {
-
   const header = (
     <View style={[styles.header, fullScreen && styles.headerFullScreen]}>
       {title && <Text style={styles.title}>{title}</Text>}
@@ -34,9 +45,19 @@ function BaseModal({
 
   const actions = (
     <View style={[styles.actions, fullScreen && styles.actionsFullScreen]}>
-      <Button label="Cancel" onPress={onClose} style={BUTTON_STYLE.OUTLINE} customStyle={styles.actionBtn} />
+      <Button
+        label="Cancel"
+        onPress={onClose}
+        style={BUTTON_STYLE.OUTLINE}
+        customStyle={styles.actionBtn}
+      />
       {!!onAction && (
-        <Button label={actionTitle} onPress={onAction} style={actionStyle} customStyle={styles.actionBtn} />
+        <Button
+          label={actionTitle}
+          onPress={onAction}
+          style={actionStyle}
+          customStyle={styles.actionBtn}
+        />
       )}
     </View>
   );
@@ -46,7 +67,7 @@ function BaseModal({
       <Modal visible={open} animationType="slide" onRequestClose={onClose}>
         <SafeAreaView style={styles.fullScreenContainer}>
           <KeyboardAvoidingView
-            style={{ flex: 1 }}
+            style={{flex: 1}}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             {header}
             <View style={styles.fullScreenBody}>{children}</View>
@@ -58,11 +79,19 @@ function BaseModal({
   }
 
   return (
-    <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={open}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}>
       <KeyboardAvoidingView
         style={styles.overlay}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
+        <TouchableOpacity
+          style={styles.backdrop}
+          activeOpacity={1}
+          onPress={onClose}
+        />
         <View style={styles.sheet}>
           {header}
           <View style={styles.body}>{children}</View>

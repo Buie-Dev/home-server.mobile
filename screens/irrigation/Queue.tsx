@@ -1,19 +1,24 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import React, {ReactElement, useEffect, useRef, useState} from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated,
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Animated,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useIrrigation from '../../hooks/useIrrigation.hook';
-import { useWebSocket } from '../../context/WebSocketContext';
-import { formatTime } from '../../lib/datetime';
-import { COLORS, SHADOWS, SPACING, RADIUS } from '../../lib/theme';
-import { formatVolume } from '../../lib/units';
-import { useUnit } from '../../context/UnitContext';
+import {useWebSocket} from '../../context/WebSocketContext';
+import {formatTime} from '../../lib/datetime';
+import {COLORS, SHADOWS, SPACING, RADIUS} from '../../lib/theme';
+import {formatVolume} from '../../lib/units';
+import {useUnit} from '../../context/UnitContext';
 
 function Queue(): ReactElement {
-  const { priorityQueue, stopAll, stopQueueItem } = useIrrigation();
-  const { liveFlow } = useWebSocket();
-  const { useGallons } = useUnit();
+  const {priorityQueue, stopAll, stopQueueItem} = useIrrigation();
+  const {liveFlow} = useWebSocket();
+  const {useGallons} = useUnit();
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
   const progressAnim = useRef(new Animated.Value(0)).current;
 
@@ -30,13 +35,16 @@ function Queue(): ReactElement {
     let initialRemaining = totalDuration;
 
     if (activeItem.startTime) {
-      const elapsed = Math.floor((Date.now() - activeItem.startTime * 1000) / 1000);
+      const elapsed = Math.floor(
+        (Date.now() - activeItem.startTime * 1000) / 1000,
+      );
       initialRemaining = Math.max(0, totalDuration - elapsed);
     }
 
     setRemainingTime(initialRemaining);
 
-    const progress = totalDuration > 0 ? 1 - initialRemaining / totalDuration : 0;
+    const progress =
+      totalDuration > 0 ? 1 - initialRemaining / totalDuration : 0;
     progressAnim.setValue(progress);
 
     const interval = setInterval(() => {
@@ -83,7 +91,9 @@ function Queue(): ReactElement {
               <Icon name="water" size={20} color={COLORS.primary} />
             </View>
             <Text style={styles.activeLabel}>Running now</Text>
-            <TouchableOpacity style={styles.stopBtn} onPress={() => stopQueueItem(activeItem.id)}>
+            <TouchableOpacity
+              style={styles.stopBtn}
+              onPress={() => stopQueueItem(activeItem.id)}>
               <Icon name="stop-circle-outline" size={20} color={COLORS.error} />
               <Text style={styles.stopBtnText}>Stop</Text>
             </TouchableOpacity>
@@ -95,21 +105,27 @@ function Queue(): ReactElement {
           {/* Progress bar */}
           <View style={styles.progressTrack}>
             <Animated.View
-              style={[styles.progressFill, { width: progressWidth }]}
+              style={[styles.progressFill, {width: progressWidth}]}
             />
           </View>
 
           <View style={styles.progressLabels}>
             <Text style={styles.progressText}>
-              {remainingTime !== null ? formatTime(remainingTime) + ' remaining' : '—'}
+              {remainingTime !== null
+                ? formatTime(remainingTime) + ' remaining'
+                : '—'}
             </Text>
-            <Text style={styles.progressText}>{formatTime(activeItem.duration)} total</Text>
+            <Text style={styles.progressText}>
+              {formatTime(activeItem.duration)} total
+            </Text>
           </View>
 
           {liveFlow?.id === activeItem.id && (
             <View style={styles.liveFlowRow}>
               <Icon name="water" size={14} color={COLORS.primary} />
-              <Text style={styles.liveFlowText}>{formatVolume(liveFlow.litres, useGallons)} used</Text>
+              <Text style={styles.liveFlowText}>
+                {formatVolume(liveFlow.litres, useGallons)} used
+              </Text>
             </View>
           )}
 
@@ -154,8 +170,12 @@ function Queue(): ReactElement {
                     </View>
                   )}
                 </View>
-                <Text style={styles.queueDuration}>{formatTime(item.duration)}</Text>
-                <TouchableOpacity onPress={() => stopQueueItem(item.id)} style={styles.removeBtn}>
+                <Text style={styles.queueDuration}>
+                  {formatTime(item.duration)}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => stopQueueItem(item.id)}
+                  style={styles.removeBtn}>
                   <Icon name="close" size={16} color={COLORS.textMuted} />
                 </TouchableOpacity>
               </View>

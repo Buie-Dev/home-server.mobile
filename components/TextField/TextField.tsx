@@ -1,6 +1,6 @@
-import React, { ReactElement } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { COLORS, RADIUS, SPACING } from '../../lib/theme';
+import React, {ReactElement} from 'react';
+import {StyleSheet, Text, TextInput, View} from 'react-native';
+import {COLORS, RADIUS, SPACING} from '../../lib/theme';
 
 export enum KeyboardType {
   Default = 'default',
@@ -33,7 +33,14 @@ interface TextFieldProps {
   placeholder?: string;
 }
 
-function TextField({ value, setValue, inputMode = InputMode.Text, keyboardType = KeyboardType.Default, label, placeholder }: TextFieldProps): ReactElement {
+function TextField({
+  value,
+  setValue,
+  inputMode = InputMode.Text,
+  keyboardType = KeyboardType.Default,
+  label,
+  placeholder,
+}: TextFieldProps): ReactElement {
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}

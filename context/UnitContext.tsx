@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEY = 'unit_preference';
@@ -8,9 +14,12 @@ interface UnitContextValue {
   toggleUnit: () => void;
 }
 
-const UnitContext = createContext<UnitContextValue>({ useGallons: false, toggleUnit: () => {} });
+const UnitContext = createContext<UnitContextValue>({
+  useGallons: false,
+  toggleUnit: () => {},
+});
 
-export const UnitProvider = ({ children }: { children: React.ReactNode }) => {
+export const UnitProvider = ({children}: {children: React.ReactNode}) => {
   const [useGallons, setUseGallons] = useState(false);
 
   useEffect(() => {
@@ -28,7 +37,7 @@ export const UnitProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <UnitContext.Provider value={{ useGallons, toggleUnit }}>
+    <UnitContext.Provider value={{useGallons, toggleUnit}}>
       {children}
     </UnitContext.Provider>
   );

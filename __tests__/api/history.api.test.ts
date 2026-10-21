@@ -1,5 +1,9 @@
 import * as base from '../../api/base.api';
-import { fetchHistory, fetchHistoryTotals, deleteHistory } from '../../api/history.api';
+import {
+  fetchHistory,
+  fetchHistoryTotals,
+  deleteHistory,
+} from '../../api/history.api';
 
 jest.mock('../../api/base.api');
 
@@ -12,10 +16,15 @@ beforeEach(() => {
 describe('history.api', () => {
   it('fetchHistory gets /irrigations/history with pagination and filter params', async () => {
     mockedBase.get.mockResolvedValue([]);
-    await fetchHistory({ limit: 100, offset: 0, zoneId: 1, startDate: '2026-01-01' });
+    await fetchHistory({
+      limit: 100,
+      offset: 0,
+      zoneId: 1,
+      startDate: '2026-01-01',
+    });
     expect(mockedBase.get).toHaveBeenCalledWith(
       expect.stringContaining('/irrigations/history'),
-      { limit: 100, offset: 0, zoneId: 1, startDate: '2026-01-01' },
+      {limit: 100, offset: 0, zoneId: 1, startDate: '2026-01-01'},
     );
   });
 
@@ -29,17 +38,19 @@ describe('history.api', () => {
   });
 
   it('fetchHistoryTotals gets /irrigations/history/totals with filter params', async () => {
-    mockedBase.get.mockResolvedValue({ today: {}, week: {}, month: {} });
-    await fetchHistoryTotals({ zoneId: 2, subzoneId: 3 });
+    mockedBase.get.mockResolvedValue({today: {}, week: {}, month: {}});
+    await fetchHistoryTotals({zoneId: 2, subzoneId: 3});
     expect(mockedBase.get).toHaveBeenCalledWith(
       expect.stringContaining('/irrigations/history/totals'),
-      { zoneId: 2, subzoneId: 3 },
+      {zoneId: 2, subzoneId: 3},
     );
   });
 
   it('deleteHistory deletes /irrigations/history/:id', async () => {
     mockedBase.del.mockResolvedValue({});
     await deleteHistory(42);
-    expect(mockedBase.del).toHaveBeenCalledWith(expect.stringContaining('/irrigations/history/42'));
+    expect(mockedBase.del).toHaveBeenCalledWith(
+      expect.stringContaining('/irrigations/history/42'),
+    );
   });
 });

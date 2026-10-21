@@ -1,11 +1,17 @@
-import React, { ReactElement, useEffect, useState } from 'react';
-import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import React, {ReactElement, useEffect, useState} from 'react';
+import {
+  Keyboard,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import BaseModal from '../BaseModal/BaseModal';
-import TextField, { InputMode, KeyboardType } from '../TextField/TextField';
-import { Subzone, Zone } from '../../hooks/useIrrigation.hook';
+import TextField, {InputMode, KeyboardType} from '../TextField/TextField';
+import {Subzone, Zone} from '../../hooks/useIrrigation.hook';
 import Checkbox from '../Checkbox/Checkbox';
-import { useWebSocket } from '../../context/WebSocketContext';
-import { COLORS, SPACING } from '../../lib/theme';
+import {useWebSocket} from '../../context/WebSocketContext';
+import {COLORS, SPACING} from '../../lib/theme';
 
 interface ManualIrrigationModelProps {
   open: boolean;
@@ -17,10 +23,14 @@ type SubzoneControl = Subzone & {
   isChecked?: boolean;
 };
 
-function ManualIrrigationModel({ open, zone, onClose }: ManualIrrigationModelProps): ReactElement {
+function ManualIrrigationModel({
+  open,
+  zone,
+  onClose,
+}: ManualIrrigationModelProps): ReactElement {
   const [time, setTime] = useState<string>('');
   const [subzones, setSubzones] = useState<SubzoneControl[]>([]);
-  const { sendMessage } = useWebSocket();
+  const {sendMessage} = useWebSocket();
 
   useEffect(() => {
     setSubzones(zone?.subzones ?? []);
@@ -28,35 +38,50 @@ function ManualIrrigationModel({ open, zone, onClose }: ManualIrrigationModelPro
   }, [zone]);
 
   const onCheckSubzones = (sz: SubzoneControl) => {
-		console.log(sz)
-		console.log(sz.isChecked)
-		console.log(!sz.isChecked)
+    console.log(sz);
+    console.log(sz.isChecked);
+    console.log(!sz.isChecked);
 
     setSubzones(prev =>
-      prev.map(s => s.id === sz.id ? { ...s, isChecked: !s.isChecked } : s)
+      prev.map(s => (s.id === sz.id ? {...s, isChecked: !s.isChecked} : s)),
     );
   };
 
   const startZone = () => {
     if (!time) return;
-		console.log(subzones)
-		console.log(subzones.filter(sz => sz.isChecked).map(sz => ({ id: sz.subzone, state: 1 })))
+    console.log(subzones);
+    console.log(
+      subzones
+        .filter(sz => sz.isChecked)
+        .map(sz => ({id: sz.subzone, state: 1})),
+    );
     sendMessage('request', {
       priority: 1,
       duration: +time,
       zone: zone!.zone,
-      subzones: subzones.filter(sz => sz.isChecked).map(sz => ({ id: sz.subzone, state: 1 })),
+      subzones: subzones
+        .filter(sz => sz.isChecked)
+        .map(sz => ({id: sz.subzone, state: 1})),
     });
     onClose();
   };
 
-	useEffect(() => {
-		console.log(subzones)
-		console.log(subzones.filter(sz => sz.isChecked).map(sz => ({ id: sz.subzone, state: 1 })))
-	}, [subzones])
+  useEffect(() => {
+    console.log(subzones);
+    console.log(
+      subzones
+        .filter(sz => sz.isChecked)
+        .map(sz => ({id: sz.subzone, state: 1})),
+    );
+  }, [subzones]);
 
   return (
-    <BaseModal open={open} title={zone?.name} onClose={onClose} onAction={startZone} actionTitle="Start">
+    <BaseModal
+      open={open}
+      title={zone?.name}
+      onClose={onClose}
+      onAction={startZone}
+      actionTitle="Start">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View>
           <TextField

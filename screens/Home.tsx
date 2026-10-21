@@ -1,11 +1,18 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { COLORS, SHADOWS, SPACING, RADIUS } from '../lib/theme';
-import { useAuth } from '../context/AuthContext';
-import type { RootStackParamList } from '../App';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {COLORS, SHADOWS, SPACING, RADIUS} from '../lib/theme';
+import {useAuth} from '../context/AuthContext';
+import type {RootStackParamList} from '../App';
 
 type Section = {
   title: string;
@@ -76,8 +83,9 @@ const SECTIONS: Section[] = [
 ];
 
 function Home() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { hasPermission } = useAuth();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const {hasPermission} = useAuth();
   const visibleSections = SECTIONS.filter(s => hasPermission(s.permission));
 
   return (
@@ -89,9 +97,8 @@ function Home() {
             key={section.title}
             style={styles.card}
             onPress={() => navigation.navigate(section.route as any)}
-            activeOpacity={0.75}
-          >
-            <View style={[styles.iconWrap, { backgroundColor: section.iconBg }]}>
+            activeOpacity={0.75}>
+            <View style={[styles.iconWrap, {backgroundColor: section.iconBg}]}>
               <Icon name={section.icon} size={28} color={section.iconColor} />
             </View>
             <Text style={styles.cardTitle}>{section.title}</Text>

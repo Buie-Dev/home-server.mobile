@@ -1,13 +1,24 @@
-import { useRef, useState } from 'react';
+import {useRef, useState} from 'react';
 import * as todoApi from '../api/todo.api';
 
-export type TodoSubcategory = { id: number; name: string; categoryId: number };
-export type TodoCategory = { id: number; name: string; subcategories: TodoSubcategory[]; itemCount: number };
-export type ChecklistItem = { id: number; text: string; checked: boolean };
+export type TodoSubcategory = {id: number; name: string; categoryId: number};
+export type TodoCategory = {
+  id: number;
+  name: string;
+  subcategories: TodoSubcategory[];
+  itemCount: number;
+};
+export type ChecklistItem = {id: number; text: string; checked: boolean};
 
-export type TemplateChecklistItem = { id: number; text: string };
+export type TemplateChecklistItem = {id: number; text: string};
 
-export type Frequency = 'one_time' | 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+export type Frequency =
+  | 'one_time'
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'quarterly'
+  | 'yearly';
 
 export type TodoTemplate = {
   id: number;
@@ -57,9 +68,17 @@ function useTodo() {
   const [loading, setLoading] = useState<boolean>(false);
 
   // Track last-used filter params so silent refetches use the same filters
-  const taskFilterRef = useRef<{ categoryId?: number; subcategoryId?: number }>({});
-  const templateFilterRef = useRef<{ categoryId?: number; subcategoryId?: number }>({});
-  const historyFilterRef = useRef<{ categoryId?: number; subcategoryId?: number }>({});
+  const taskFilterRef = useRef<{categoryId?: number; subcategoryId?: number}>(
+    {},
+  );
+  const templateFilterRef = useRef<{
+    categoryId?: number;
+    subcategoryId?: number;
+  }>({});
+  const historyFilterRef = useRef<{
+    categoryId?: number;
+    subcategoryId?: number;
+  }>({});
 
   const fetchCategories = async () => {
     try {
@@ -70,8 +89,11 @@ function useTodo() {
     }
   };
 
-  const fetchTemplates = async (categoryId?: number, subcategoryId?: number) => {
-    templateFilterRef.current = { categoryId, subcategoryId };
+  const fetchTemplates = async (
+    categoryId?: number,
+    subcategoryId?: number,
+  ) => {
+    templateFilterRef.current = {categoryId, subcategoryId};
     setLoading(true);
     try {
       const data = await todoApi.fetchTemplates(categoryId, subcategoryId);
@@ -84,7 +106,7 @@ function useTodo() {
   };
 
   const refetchTemplates = async () => {
-    const { categoryId, subcategoryId } = templateFilterRef.current;
+    const {categoryId, subcategoryId} = templateFilterRef.current;
     try {
       const data = await todoApi.fetchTemplates(categoryId, subcategoryId);
       setTemplates(data as TodoTemplate[]);
@@ -94,7 +116,7 @@ function useTodo() {
   };
 
   const fetchTasks = async (categoryId?: number, subcategoryId?: number) => {
-    taskFilterRef.current = { categoryId, subcategoryId };
+    taskFilterRef.current = {categoryId, subcategoryId};
     setLoading(true);
     try {
       const data = await todoApi.fetchTasks(categoryId, subcategoryId);
@@ -107,7 +129,7 @@ function useTodo() {
   };
 
   const refetchTasks = async () => {
-    const { categoryId, subcategoryId } = taskFilterRef.current;
+    const {categoryId, subcategoryId} = taskFilterRef.current;
     try {
       const data = await todoApi.fetchTasks(categoryId, subcategoryId);
       setTasks(data as TodoTask[]);
@@ -147,15 +169,30 @@ function useTodo() {
   };
 
   const createTemplate = async (data: {
-    title: string; notes?: string; categoryId: number; subcategoryId?: number; frequency: string; checklistItems?: string[]; month?: number;
+    title: string;
+    notes?: string;
+    categoryId: number;
+    subcategoryId?: number;
+    frequency: string;
+    checklistItems?: string[];
+    month?: number;
   }) => {
-    const result = await todoApi.createTemplate(data) as { id: number };
+    const result = (await todoApi.createTemplate(data)) as {id: number};
     return result?.id ?? null;
   };
 
-  const updateTemplate = async (id: number, data: {
-    title: string; notes?: string; categoryId: number; subcategoryId?: number; frequency: string; checklistItems?: string[]; month?: number;
-  }) => {
+  const updateTemplate = async (
+    id: number,
+    data: {
+      title: string;
+      notes?: string;
+      categoryId: number;
+      subcategoryId?: number;
+      frequency: string;
+      checklistItems?: string[];
+      month?: number;
+    },
+  ) => {
     await todoApi.updateTemplate(id, data);
   };
 
@@ -165,7 +202,7 @@ function useTodo() {
   };
 
   const fetchHistory = async (categoryId?: number, subcategoryId?: number) => {
-    historyFilterRef.current = { categoryId, subcategoryId };
+    historyFilterRef.current = {categoryId, subcategoryId};
     setLoading(true);
     try {
       const data = await todoApi.fetchHistory(categoryId, subcategoryId);
@@ -178,7 +215,7 @@ function useTodo() {
   };
 
   const refetchHistory = async () => {
-    const { categoryId, subcategoryId } = historyFilterRef.current;
+    const {categoryId, subcategoryId} = historyFilterRef.current;
     try {
       const data = await todoApi.fetchHistory(categoryId, subcategoryId);
       setHistory(data as TodoHistoryItem[]);
@@ -192,21 +229,36 @@ function useTodo() {
   };
 
   const addDirectTask = async (data: {
-    title: string; notes?: string; categoryId: number; subcategoryId?: number;
+    title: string;
+    notes?: string;
+    categoryId: number;
+    subcategoryId?: number;
   }) => {
-    await todoApi.addDirectTask({ ...data, frequency: 'one_time' });
+    await todoApi.addDirectTask({...data, frequency: 'one_time'});
   };
 
   const addTaskWithTemplate = async (data: {
-    title: string; notes?: string; categoryId: number; subcategoryId?: number; frequency: string; checklistItems?: string[]; month?: number;
+    title: string;
+    notes?: string;
+    categoryId: number;
+    subcategoryId?: number;
+    frequency: string;
+    checklistItems?: string[];
+    month?: number;
   }) => {
     const templateId = await createTemplate(data);
     if (templateId) await todoApi.addTask(templateId);
   };
 
-  const updateTask = async (id: number, data: {
-    title: string; notes?: string; categoryId: number; subcategoryId?: number;
-  }) => {
+  const updateTask = async (
+    id: number,
+    data: {
+      title: string;
+      notes?: string;
+      categoryId: number;
+      subcategoryId?: number;
+    },
+  ) => {
     await todoApi.updateTask(id, data);
     await refetchTasks();
     await refetchHistory();
@@ -238,45 +290,108 @@ function useTodo() {
   };
 
   const addChecklistItem = async (taskId: number, text: string) => {
-    const item = await todoApi.addChecklistItem(taskId, text) as ChecklistItem;
-    setTasks(prev => prev.map(t =>
-      t.id === taskId ? { ...t, checklistItems: [...(t.checklistItems ?? []), item] } : t
-    ));
+    const item = (await todoApi.addChecklistItem(
+      taskId,
+      text,
+    )) as ChecklistItem;
+    setTasks(prev =>
+      prev.map(t =>
+        t.id === taskId
+          ? {...t, checklistItems: [...(t.checklistItems ?? []), item]}
+          : t,
+      ),
+    );
   };
 
-  const toggleChecklistItem = async (taskId: number, itemId: number, checked: boolean) => {
-    await todoApi.updateChecklistItem(itemId, { checked });
-    setTasks(prev => prev.map(t =>
-      t.id === taskId
-        ? { ...t, checklistItems: t.checklistItems?.map(i => i.id === itemId ? { ...i, checked } : i) }
-        : t
-    ));
+  const toggleChecklistItem = async (
+    taskId: number,
+    itemId: number,
+    checked: boolean,
+  ) => {
+    await todoApi.updateChecklistItem(itemId, {checked});
+    setTasks(prev =>
+      prev.map(t =>
+        t.id === taskId
+          ? {
+              ...t,
+              checklistItems: t.checklistItems?.map(i =>
+                i.id === itemId ? {...i, checked} : i,
+              ),
+            }
+          : t,
+      ),
+    );
   };
 
-  const updateChecklistItemText = async (taskId: number, itemId: number, text: string) => {
-    await todoApi.updateChecklistItem(itemId, { text });
-    setTasks(prev => prev.map(t =>
-      t.id === taskId
-        ? { ...t, checklistItems: t.checklistItems?.map(i => i.id === itemId ? { ...i, text } : i) }
-        : t
-    ));
+  const updateChecklistItemText = async (
+    taskId: number,
+    itemId: number,
+    text: string,
+  ) => {
+    await todoApi.updateChecklistItem(itemId, {text});
+    setTasks(prev =>
+      prev.map(t =>
+        t.id === taskId
+          ? {
+              ...t,
+              checklistItems: t.checklistItems?.map(i =>
+                i.id === itemId ? {...i, text} : i,
+              ),
+            }
+          : t,
+      ),
+    );
   };
 
   const removeChecklistItem = async (taskId: number, itemId: number) => {
     await todoApi.deleteChecklistItem(itemId);
-    setTasks(prev => prev.map(t =>
-      t.id === taskId ? { ...t, checklistItems: t.checklistItems?.filter(i => i.id !== itemId) } : t
-    ));
+    setTasks(prev =>
+      prev.map(t =>
+        t.id === taskId
+          ? {
+              ...t,
+              checklistItems: t.checklistItems?.filter(i => i.id !== itemId),
+            }
+          : t,
+      ),
+    );
   };
 
   return {
-    categories, templates, tasks, history, loading,
-    fetchCategories, fetchTemplates, refetchTemplates, fetchTasks, refetchTasks, fetchHistory, refetchHistory,
-    createCategory, createSubcategory,
-    updateCategory, updateSubcategory, deleteSubcategory, deleteCategory,
-    createTemplate, updateTemplate, deleteTemplate,
-    addTask, addDirectTask, addTaskWithTemplate, updateTask, completeTask, removeTask, archiveTask, archiveAllCompleted, deleteHistoryItem,
-    addChecklistItem, toggleChecklistItem, updateChecklistItemText, removeChecklistItem,
+    categories,
+    templates,
+    tasks,
+    history,
+    loading,
+    fetchCategories,
+    fetchTemplates,
+    refetchTemplates,
+    fetchTasks,
+    refetchTasks,
+    fetchHistory,
+    refetchHistory,
+    createCategory,
+    createSubcategory,
+    updateCategory,
+    updateSubcategory,
+    deleteSubcategory,
+    deleteCategory,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate,
+    addTask,
+    addDirectTask,
+    addTaskWithTemplate,
+    updateTask,
+    completeTask,
+    removeTask,
+    archiveTask,
+    archiveAllCompleted,
+    deleteHistoryItem,
+    addChecklistItem,
+    toggleChecklistItem,
+    updateChecklistItemText,
+    removeChecklistItem,
   };
 }
 

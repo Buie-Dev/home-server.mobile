@@ -1,8 +1,17 @@
 import * as base from '../../api/base.api';
 import {
-  fetchCategories, createCategory, updateCategory, deleteCategory,
-  createSubcategory, updateSubcategory, deleteSubcategory,
-  fetchIdeas, createIdea, updateIdea, toggleIdea, deleteIdea,
+  fetchCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  createSubcategory,
+  updateSubcategory,
+  deleteSubcategory,
+  fetchIdeas,
+  createIdea,
+  updateIdea,
+  toggleIdea,
+  deleteIdea,
 } from '../../api/megan.api';
 
 jest.mock('../../api/base.api');
@@ -17,7 +26,9 @@ describe('megan.api', () => {
   it('fetchCategories gets /megan/categories', async () => {
     mockedBase.get.mockResolvedValue([]);
     await fetchCategories();
-    expect(mockedBase.get).toHaveBeenCalledWith(expect.stringContaining('/megan/categories'));
+    expect(mockedBase.get).toHaveBeenCalledWith(
+      expect.stringContaining('/megan/categories'),
+    );
   });
 
   it('createCategory posts to /megan/categories', async () => {
@@ -25,7 +36,7 @@ describe('megan.api', () => {
     await createCategory('Dates', ['Restaurants']);
     expect(mockedBase.post).toHaveBeenCalledWith(
       expect.stringContaining('/megan/categories'),
-      { name: 'Dates', subcategoryNames: ['Restaurants'] },
+      {name: 'Dates', subcategoryNames: ['Restaurants']},
     );
   });
 
@@ -34,7 +45,7 @@ describe('megan.api', () => {
     await createSubcategory(1, 'Activities');
     expect(mockedBase.post).toHaveBeenCalledWith(
       expect.stringContaining('/megan/categories/1/subcategories'),
-      { name: 'Activities' },
+      {name: 'Activities'},
     );
   });
 
@@ -43,16 +54,16 @@ describe('megan.api', () => {
     await fetchIdeas(1, 2);
     expect(mockedBase.get).toHaveBeenCalledWith(
       expect.stringContaining('/megan/ideas'),
-      { categoryId: 1, subcategoryId: 2 },
+      {categoryId: 1, subcategoryId: 2},
     );
   });
 
   it('createIdea posts to /megan/ideas', async () => {
     mockedBase.post.mockResolvedValue({});
-    await createIdea({ title: 'Picnic', categoryId: 1 });
+    await createIdea({title: 'Picnic', categoryId: 1});
     expect(mockedBase.post).toHaveBeenCalledWith(
       expect.stringContaining('/megan/ideas'),
-      expect.objectContaining({ title: 'Picnic' }),
+      expect.objectContaining({title: 'Picnic'}),
     );
   });
 
@@ -61,13 +72,15 @@ describe('megan.api', () => {
     await toggleIdea(3, true);
     expect(mockedBase.put).toHaveBeenCalledWith(
       expect.stringContaining('/megan/ideas/3/toggle'),
-      { completed: true },
+      {completed: true},
     );
   });
 
   it('deleteIdea deletes /megan/ideas/:id', async () => {
     mockedBase.del.mockResolvedValue({});
     await deleteIdea(4);
-    expect(mockedBase.del).toHaveBeenCalledWith(expect.stringContaining('/megan/ideas/4'));
+    expect(mockedBase.del).toHaveBeenCalledWith(
+      expect.stringContaining('/megan/ideas/4'),
+    );
   });
 });

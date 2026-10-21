@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, Platform, StyleSheet } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import TextField, { InputMode, KeyboardType } from '../TextField/TextField';
+import TextField, {InputMode, KeyboardType} from '../TextField/TextField';
 
 interface TimePickerProps {
-	minute: string;
-	hour: string;
+  minute: string;
+  hour: string;
   onChange: (hour: string, minute: string) => void; // return string in HH:mm
 }
 
@@ -14,34 +21,34 @@ const formatDateToHHMM = (date: Date): string => {
   return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
-const TimePicker: React.FC<TimePickerProps> = ({ onChange, hour, minute }) => {
-	const [localHour, setLocalHour] = useState<string>('')
-	const [localMinutes, setLocalMinutes] = useState<string>('')
+const TimePicker: React.FC<TimePickerProps> = ({onChange, hour, minute}) => {
+  const [localHour, setLocalHour] = useState<string>('');
+  const [localMinutes, setLocalMinutes] = useState<string>('');
 
-  const changeTime = (hour:  string, minute: string) => {
-		let localHour = hour;
-		let localMinute = minute;
-		if (parseInt(hour) > 23) {
-			localHour = '23';
-		}
-		if (parseInt(minute) > 59) {
-			localMinute = '59';
-		}
-		onChange(localHour, localMinute)
-	}
+  const changeTime = (hour: string, minute: string) => {
+    let localHour = hour;
+    let localMinute = minute;
+    if (parseInt(hour) > 23) {
+      localHour = '23';
+    }
+    if (parseInt(minute) > 59) {
+      localMinute = '59';
+    }
+    onChange(localHour, localMinute);
+  };
 
-	useEffect(() => {
-		setLocalHour(hour)
-		setLocalMinutes(minute)
-	}, [hour, minute])
+  useEffect(() => {
+    setLocalHour(hour);
+    setLocalMinutes(minute);
+  }, [hour, minute]);
 
   return (
     <View style={styles.container}>
       <View style={styles.timeContainer}>
         <View style={styles.inputContainer}>
-          <TextField 
+          <TextField
             value={hour}
-						label={"Hour"}
+            label={'Hour'}
             setValue={(hour: string) => changeTime(hour, localMinutes)}
             inputMode={InputMode.Numeric}
             keyboardType={KeyboardType.NumberPad}
@@ -49,9 +56,9 @@ const TimePicker: React.FC<TimePickerProps> = ({ onChange, hour, minute }) => {
         </View>
         <Text style={styles.separator}>:</Text>
         <View style={styles.inputContainer}>
-          <TextField 
+          <TextField
             value={localMinutes}
-						label={"Minute"}
+            label={'Minute'}
             setValue={(minute: string) => changeTime(localHour, minute)}
             inputMode={InputMode.Numeric}
             keyboardType={KeyboardType.NumberPad}
@@ -84,4 +91,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TimePicker
+export default TimePicker;

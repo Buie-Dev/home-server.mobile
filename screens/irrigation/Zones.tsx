@@ -1,13 +1,19 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, {ReactElement, useEffect, useState} from 'react';
 import {
-  Text, View, StyleSheet, ScrollView, TouchableOpacity,
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import useIrrigation, { Zone } from '../../hooks/useIrrigation.hook';
+import useIrrigation, {Zone} from '../../hooks/useIrrigation.hook';
 import ManualIrrigationModal from '../../components/ManualIrrigationModal/ManualIrrigationModal';
-import ZonesFilter, { FilterItem } from '../../components/ZonesFilter/ZonesFilter';
-import { COLORS, SHADOWS, SPACING, RADIUS } from '../../lib/theme';
-import { formatTime } from '../../lib/datetime';
+import ZonesFilter, {
+  FilterItem,
+} from '../../components/ZonesFilter/ZonesFilter';
+import {COLORS, SHADOWS, SPACING, RADIUS} from '../../lib/theme';
+import {formatTime} from '../../lib/datetime';
 
 const ZONE_ICONS: Record<string, string> = {
   garden: 'flower-outline',
@@ -21,9 +27,12 @@ const getZoneIcon = (type: string) =>
   ZONE_ICONS[type?.toLowerCase()] ?? 'sprinkler-variant';
 
 function Zones(): ReactElement {
-  const { fetchZones, zones, priorityQueue, fetchZoneTypes, zoneTypes } = useIrrigation();
+  const {fetchZones, zones, priorityQueue, fetchZoneTypes, zoneTypes} =
+    useIrrigation();
   const [selectedZone, setSelectedZone] = useState<Zone>();
-  const [selectedFilter, setSelectedFilter] = useState<FilterItem | undefined>();
+  const [selectedFilter, setSelectedFilter] = useState<
+    FilterItem | undefined
+  >();
 
   useEffect(() => {
     fetchZones(selectedFilter?.id);
@@ -44,15 +53,30 @@ function Zones(): ReactElement {
     priorityQueue.find(pq => pq.zone === z.zone);
 
   const STATUS_STYLE = {
-    active: { bg: COLORS.successLight, border: COLORS.success, label: 'Active', labelColor: COLORS.success },
-    queued: { bg: COLORS.warningLight, border: COLORS.warning, label: 'Queued', labelColor: COLORS.warning },
-    idle: { bg: COLORS.surface, border: COLORS.border, label: '', labelColor: COLORS.textMuted },
+    active: {
+      bg: COLORS.successLight,
+      border: COLORS.success,
+      label: 'Active',
+      labelColor: COLORS.success,
+    },
+    queued: {
+      bg: COLORS.warningLight,
+      border: COLORS.warning,
+      label: 'Queued',
+      labelColor: COLORS.warning,
+    },
+    idle: {
+      bg: COLORS.surface,
+      border: COLORS.border,
+      label: '',
+      labelColor: COLORS.textMuted,
+    },
   };
 
   return (
     <View style={styles.screen}>
       <ZonesFilter
-        items={zoneTypes.map(zt => ({ id: zt.id, label: zt.type }))}
+        items={zoneTypes.map(zt => ({id: zt.id, label: zt.type}))}
         selected={selectedFilter}
         onSelect={setSelectedFilter}
       />
@@ -66,12 +90,23 @@ function Zones(): ReactElement {
           return (
             <TouchableOpacity
               key={z.id}
-              style={[styles.card, { backgroundColor: cfg.bg, borderColor: cfg.border }]}
+              style={[
+                styles.card,
+                {backgroundColor: cfg.bg, borderColor: cfg.border},
+              ]}
               onPress={() => setSelectedZone(z)}
-              activeOpacity={0.75}
-            >
-              <View style={[styles.iconWrap, { backgroundColor: cfg.border + '22' }]}>
-                <Icon name={getZoneIcon(z.type)} size={24} color={cfg.border === COLORS.border ? COLORS.textSecondary : cfg.border} />
+              activeOpacity={0.75}>
+              <View
+                style={[styles.iconWrap, {backgroundColor: cfg.border + '22'}]}>
+                <Icon
+                  name={getZoneIcon(z.type)}
+                  size={24}
+                  color={
+                    cfg.border === COLORS.border
+                      ? COLORS.textSecondary
+                      : cfg.border
+                  }
+                />
               </View>
 
               <View style={styles.cardInfo}>
@@ -82,12 +117,14 @@ function Zones(): ReactElement {
 
               <View style={styles.cardRight}>
                 {status !== 'idle' && (
-                  <View style={[styles.badge, { backgroundColor: cfg.border }]}>
+                  <View style={[styles.badge, {backgroundColor: cfg.border}]}>
                     <Text style={styles.badgeText}>{cfg.label}</Text>
                   </View>
                 )}
                 {queueItem && (
-                  <Text style={styles.queueTimer}>{formatTime(queueItem.duration)}</Text>
+                  <Text style={styles.queueTimer}>
+                    {formatTime(queueItem.duration)}
+                  </Text>
                 )}
                 <Icon name="chevron-right" size={18} color={COLORS.textMuted} />
               </View>

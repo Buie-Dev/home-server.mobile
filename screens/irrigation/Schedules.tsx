@@ -1,16 +1,35 @@
-import React, { ReactElement, useEffect, useState } from 'react';
-import { Alert, Text, View, StyleSheet, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
-import DraggableFlatList, { RenderItemParams, ScaleDecorator } from 'react-native-draggable-flatlist';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import React, {ReactElement, useEffect, useState} from 'react';
+import {
+  Alert,
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Switch,
+  ActivityIndicator,
+} from 'react-native';
+import DraggableFlatList, {
+  RenderItemParams,
+  ScaleDecorator,
+} from 'react-native-draggable-flatlist';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import useIrrigation, { Schedule } from '../../hooks/useIrrigation.hook';
+import useIrrigation, {Schedule} from '../../hooks/useIrrigation.hook';
 import CreateScheduleModal from '../../components/CreateScheduleModal/CreateScheduleModal';
 import DeleteScheduleConfirmationModal from '../../components/DeleteConfirmationScheduleModal/DeleteConfirmationScheduleModal';
 import ZoneFilterBar from '../../components/ZoneFilterBar/ZoneFilterBar';
-import { COLORS, SHADOWS, SPACING, RADIUS } from '../../lib/theme';
+import {COLORS, SHADOWS, SPACING, RADIUS} from '../../lib/theme';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
-const DAY_KEYS: (keyof Schedule)[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const DAY_KEYS: (keyof Schedule)[] = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];
 
 const formatDaysLabel = (s: Schedule) => {
   const active = DAY_KEYS.filter(k => s[k]);
@@ -23,7 +42,16 @@ const formatDaysLabel = (s: Schedule) => {
 
 function Schedules(): ReactElement {
   const [openCreate, setOpenCreate] = useState(false);
-  const { schedules, fetchSchedules, toggleSchedule, reorderSchedules, checkSync, forceSync, zoneDetails, fetchZones } = useIrrigation();
+  const {
+    schedules,
+    fetchSchedules,
+    toggleSchedule,
+    reorderSchedules,
+    checkSync,
+    forceSync,
+    zoneDetails,
+    fetchZones,
+  } = useIrrigation();
   const [selectedDelete, setSelectedDelete] = useState<Schedule>();
   const [selectedEdit, setSelectedEdit] = useState<Schedule | undefined>();
   const [syncChecking, setSyncChecking] = useState(false);
@@ -47,44 +75,60 @@ function Schedules(): ReactElement {
     setSyncChecking(false);
 
     if (!result) {
-      Alert.alert('Sync Check Failed', 'Could not reach the automation service.');
+      Alert.alert(
+        'Sync Check Failed',
+        'Could not reach the automation service.',
+      );
       return;
     }
     if (result.timeout) {
-      Alert.alert('Sync Check Timeout', 'No response from the automation service.');
+      Alert.alert(
+        'Sync Check Timeout',
+        'No response from the automation service.',
+      );
       return;
     }
     if (result.in_sync) {
-      Alert.alert('In Sync', 'All schedules match the automation service.', [{ text: 'OK' }]);
+      Alert.alert('In Sync', 'All schedules match the automation service.', [
+        {text: 'OK'},
+      ]);
       return;
     }
 
     const lines: string[] = [];
     if (result.missing_from_automation.length > 0) {
-      lines.push(`Missing from automation: IDs ${result.missing_from_automation.join(', ')}`);
+      lines.push(
+        `Missing from automation: IDs ${result.missing_from_automation.join(
+          ', ',
+        )}`,
+      );
     }
     if (result.extra_in_automation.length > 0) {
-      lines.push(`Extra in automation (inactive/deleted): IDs ${result.extra_in_automation.join(', ')}`);
+      lines.push(
+        `Extra in automation (inactive/deleted): IDs ${result.extra_in_automation.join(
+          ', ',
+        )}`,
+      );
     }
     result.mismatched.forEach(m => {
       lines.push(`Schedule ${m.id} mismatched:\n  ${m.diffs.join('\n  ')}`);
     });
 
-    Alert.alert(
-      'Out of Sync',
-      lines.join('\n\n'),
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Force Sync',
-          style: 'destructive',
-          onPress: async () => {
-            const r = await forceSync();
-            if (r) Alert.alert('Synced', `${r.synced} schedule(s) re-synced to automation service.`);
-          },
+    Alert.alert('Out of Sync', lines.join('\n\n'), [
+      {text: 'Cancel', style: 'cancel'},
+      {
+        text: 'Force Sync',
+        style: 'destructive',
+        onPress: async () => {
+          const r = await forceSync();
+          if (r)
+            Alert.alert(
+              'Synced',
+              `${r.synced} schedule(s) re-synced to automation service.`,
+            );
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const onSave = () => {
@@ -92,18 +136,31 @@ function Schedules(): ReactElement {
     setOpenCreate(false);
   };
 
-  const onDragEnd = async ({ data }: { data: Schedule[] }) => {
+  const onDragEnd = async ({data}: {data: Schedule[]}) => {
     await reorderSchedules(data.map(s => s.id));
     fetchSchedules(activeZoneId, activeSubzoneId);
   };
 
-  const renderItem = ({ item: s, drag, isActive }: RenderItemParams<Schedule>) => (
+  const renderItem = ({
+    item: s,
+    drag,
+    isActive,
+  }: RenderItemParams<Schedule>) => (
     <ScaleDecorator>
-      <View style={[styles.card, !s.active && styles.cardInactive, isActive && styles.cardDragging]}>
+      <View
+        style={[
+          styles.card,
+          !s.active && styles.cardInactive,
+          isActive && styles.cardDragging,
+        ]}>
         {/* Header row */}
         <View style={styles.cardHeader}>
           <TouchableOpacity onLongPress={drag} style={styles.dragHandle}>
-            <Icon name="drag-horizontal-variant" size={18} color={COLORS.textMuted} />
+            <Icon
+              name="drag-horizontal-variant"
+              size={18}
+              color={COLORS.textMuted}
+            />
           </TouchableOpacity>
           <View style={styles.timeBlock}>
             <Icon name="clock-outline" size={14} color={COLORS.textSecondary} />
@@ -113,28 +170,36 @@ function Schedules(): ReactElement {
             <Switch
               value={!!s.active}
               onValueChange={v => toggleSchedule(s.id, v)}
-              trackColor={{ false: COLORS.border, true: COLORS.primaryLight }}
+              trackColor={{false: COLORS.border, true: COLORS.primaryLight}}
               thumbColor={s.active ? COLORS.primary : COLORS.textMuted}
               style={styles.switch}
             />
-            <TouchableOpacity onPress={() => setSelectedEdit(s)} style={styles.deleteBtn}>
+            <TouchableOpacity
+              onPress={() => setSelectedEdit(s)}
+              style={styles.deleteBtn}>
               <Icon name="pencil-outline" size={18} color={COLORS.primary} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setSelectedDelete(s)} style={styles.deleteBtn}>
+            <TouchableOpacity
+              onPress={() => setSelectedDelete(s)}
+              style={styles.deleteBtn}>
               <Icon name="trash-can-outline" size={18} color={COLORS.error} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Name */}
-        <Text style={[styles.scheduleName, !s.active && styles.textInactive]}>{s.name}</Text>
+        <Text style={[styles.scheduleName, !s.active && styles.textInactive]}>
+          {s.name}
+        </Text>
 
         {/* Day pills */}
         <View style={styles.dayRow}>
           {DAYS.map((d, i) => {
             const on = s[DAY_KEYS[i]] as boolean;
             return (
-              <View key={d} style={[styles.dayPill, on && styles.dayPillActive]}>
+              <View
+                key={d}
+                style={[styles.dayPill, on && styles.dayPillActive]}>
                 <Text style={[styles.dayLetter, on && styles.dayLetterActive]}>
                   {d[0]}
                 </Text>
@@ -151,13 +216,25 @@ function Schedules(): ReactElement {
             <Text style={styles.metaText}>{s.duration} min</Text>
           </View>
           <View style={styles.metaItem}>
-            <Icon name="sprinkler-variant" size={13} color={COLORS.textSecondary} />
+            <Icon
+              name="sprinkler-variant"
+              size={13}
+              color={COLORS.textSecondary}
+            />
             <Text style={styles.metaText}>{s.zoneName}</Text>
           </View>
           {s.subzoneNames && (
             <View style={[styles.metaItem, styles.metaItemFlex]}>
-              <Icon name="source-branch" size={13} color={COLORS.textSecondary} />
-              <Text style={[styles.metaText, styles.metaTextFlex]} numberOfLines={1}>{s.subzoneNames}</Text>
+              <Icon
+                name="source-branch"
+                size={13}
+                color={COLORS.textSecondary}
+              />
+              <Text
+                style={[styles.metaText, styles.metaTextFlex]}
+                numberOfLines={1}>
+                {s.subzoneNames}
+              </Text>
             </View>
           )}
         </View>
@@ -179,30 +256,46 @@ function Schedules(): ReactElement {
           <View style={styles.emptyState}>
             <Icon name="calendar-clock" size={48} color={COLORS.textMuted} />
             <Text style={styles.emptyTitle}>No schedules yet</Text>
-            <Text style={styles.emptySub}>Tap below to create your first schedule</Text>
+            <Text style={styles.emptySub}>
+              Tap below to create your first schedule
+            </Text>
           </View>
         }
       />
 
       {/* Action row */}
       <View style={styles.actionRow}>
-        <TouchableOpacity style={styles.createBtn} onPress={() => setOpenCreate(true)}>
+        <TouchableOpacity
+          style={styles.createBtn}
+          onPress={() => setOpenCreate(true)}>
           <Icon name="plus" size={20} color={COLORS.surface} />
           <Text style={styles.createBtnText}>Create Schedule</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.syncBtn} onPress={onCheckSync} disabled={syncChecking}>
-          {syncChecking
-            ? <ActivityIndicator size="small" color={COLORS.primary} />
-            : <Icon name="sync" size={20} color={COLORS.primary} />}
+        <TouchableOpacity
+          style={styles.syncBtn}
+          onPress={onCheckSync}
+          disabled={syncChecking}>
+          {syncChecking ? (
+            <ActivityIndicator size="small" color={COLORS.primary} />
+          ) : (
+            <Icon name="sync" size={20} color={COLORS.primary} />
+          )}
         </TouchableOpacity>
       </View>
 
-      <CreateScheduleModal open={openCreate} onClose={() => setOpenCreate(false)} onSave={onSave} />
+      <CreateScheduleModal
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        onSave={onSave}
+      />
       <CreateScheduleModal
         open={!!selectedEdit}
         editSchedule={selectedEdit}
         onClose={() => setSelectedEdit(undefined)}
-        onSave={() => { setSelectedEdit(undefined); fetchSchedules(activeZoneId, activeSubzoneId); }}
+        onSave={() => {
+          setSelectedEdit(undefined);
+          fetchSchedules(activeZoneId, activeSubzoneId);
+        }}
       />
       <DeleteScheduleConfirmationModal
         schedule={selectedDelete}
@@ -272,7 +365,7 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   switch: {
-    transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
+    transform: [{scaleX: 0.85}, {scaleY: 0.85}],
   },
   deleteBtn: {
     padding: 4,

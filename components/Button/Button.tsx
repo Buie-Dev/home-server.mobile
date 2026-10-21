@@ -1,6 +1,12 @@
-import React, { ReactElement } from 'react';
-import { StyleSheet, Text, TouchableOpacity, ViewStyle, StyleProp } from 'react-native';
-import { COLORS, RADIUS, SPACING } from '../../lib/theme';
+import React, {ReactElement} from 'react';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ViewStyle,
+  StyleProp,
+} from 'react-native';
+import {COLORS, RADIUS, SPACING} from '../../lib/theme';
 
 export enum BUTTON_STYLE {
   SOLID = 'solid',
@@ -16,26 +22,43 @@ interface ButtonProps {
   disabled?: boolean;
 }
 
-function Button({ onPress, label, style = BUTTON_STYLE.SOLID, customStyle, disabled }: ButtonProps): ReactElement {
+function Button({
+  onPress,
+  label,
+  style = BUTTON_STYLE.SOLID,
+  customStyle,
+  disabled,
+}: ButtonProps): ReactElement {
   const getStyle = () => {
     switch (style) {
-      case BUTTON_STYLE.SOLID:   return styles.solid;
-      case BUTTON_STYLE.OUTLINE: return styles.outline;
-      case BUTTON_STYLE.DANGER:  return styles.danger;
-      default: return {};
+      case BUTTON_STYLE.SOLID:
+        return styles.solid;
+      case BUTTON_STYLE.OUTLINE:
+        return styles.outline;
+      case BUTTON_STYLE.DANGER:
+        return styles.danger;
+      default:
+        return {};
     }
   };
 
   const getTextStyle = () => {
     switch (style) {
-      case BUTTON_STYLE.OUTLINE: return styles.outlineText;
-      default: return styles.solidText;
+      case BUTTON_STYLE.OUTLINE:
+        return styles.outlineText;
+      default:
+        return styles.solidText;
     }
   };
 
   return (
     <TouchableOpacity
-      style={[styles.button, getStyle(), disabled && styles.disabled, customStyle]}
+      style={[
+        styles.button,
+        getStyle(),
+        disabled && styles.disabled,
+        customStyle,
+      ]}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.8}>

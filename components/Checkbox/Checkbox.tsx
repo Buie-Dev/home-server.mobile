@@ -1,6 +1,6 @@
 import CheckBox from '@react-native-community/checkbox';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { COLORS, SPACING } from '../../lib/theme';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {COLORS, SPACING} from '../../lib/theme';
 
 interface CheckboxProps {
   setChecked: () => void;
@@ -8,14 +8,17 @@ interface CheckboxProps {
   label: string;
 }
 
-function Checkbox({ checked, setChecked, label }: CheckboxProps) {
+function Checkbox({checked, setChecked, label}: CheckboxProps) {
   return (
-    <TouchableOpacity style={styles.container} onPress={setChecked} activeOpacity={0.7}>
-      <View style={{ transform: [{ scale: 0.85 }] }}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={setChecked}
+      activeOpacity={0.7}>
+      <View style={{transform: [{scale: 0.85}]}}>
         <CheckBox
           value={checked}
           onValueChange={() => {}}
-          tintColors={{ true: COLORS.primary, false: COLORS.border }}
+          tintColors={{true: COLORS.primary, false: COLORS.border}}
         />
       </View>
       <Text style={styles.label}>{label}</Text>

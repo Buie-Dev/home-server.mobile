@@ -132,7 +132,7 @@ types/
 - All imports at the top of the file, never inline.
 - All filtering done on the backend via query params, never filter arrays on the frontend.
 - All function parameters use object destructuring with a named type. No positional parameters.
-- Commit messages are imperative, sentence case. Commits by Claude keep the Co-Authored-By trailer.
+- Commit messages are imperative, sentence case. No Co-Authored-By trailer or any AI attribution on commits.
 - Two long-lived branches: `main` (stable) and `dev` (ongoing work). Spec branches are named `spec/NNN-short-name`, branch from dev and merge back into dev.
 
 ## Boundaries

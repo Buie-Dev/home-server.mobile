@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import * as meganApi from '../api/megan.api';
 
 export type MeganSubcategory = {
@@ -92,18 +92,21 @@ function useMegan() {
     await fetchIdeas();
   };
 
-  const updateIdea = async (id: number, data: {
-    title: string;
-    categoryId: number;
-    subcategoryId?: number;
-    notes?: string;
-  }) => {
+  const updateIdea = async (
+    id: number,
+    data: {
+      title: string;
+      categoryId: number;
+      subcategoryId?: number;
+      notes?: string;
+    },
+  ) => {
     await meganApi.updateIdea(id, data);
   };
 
   const toggleIdea = async (id: number, completed: boolean) => {
     await meganApi.toggleIdea(id, completed);
-    setIdeas(prev => prev.map(i => i.id === id ? { ...i, completed } : i));
+    setIdeas(prev => prev.map(i => (i.id === id ? {...i, completed} : i)));
   };
 
   const deleteIdea = async (id: number) => {
