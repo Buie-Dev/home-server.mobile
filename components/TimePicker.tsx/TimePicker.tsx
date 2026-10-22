@@ -1,13 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  Platform,
-  StyleSheet,
-} from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import {View, Text, StyleSheet} from 'react-native';
 import TextField, {InputMode, KeyboardType} from '../TextField/TextField';
 
 interface TimePickerProps {
@@ -15,11 +7,6 @@ interface TimePickerProps {
   hour: string;
   onChange: (hour: string, minute: string) => void; // return string in HH:mm
 }
-
-const formatDateToHHMM = (date: Date): string => {
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-};
 
 const TimePicker: React.FC<TimePickerProps> = ({onChange, hour, minute}) => {
   const [localHour, setLocalHour] = useState<string>('');

@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Modal,
   Pressable,
-  Dimensions,
 } from 'react-native';
 
 export interface DropdownItem {
@@ -19,7 +18,6 @@ interface DropdownProps {
   label: string;
   items: DropdownItem[];
   style?: any;
-  position?: 'left' | 'right';
   triggerStyle?: any;
   labelStyle?: any;
 }
@@ -28,12 +26,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
   label,
   items,
   style,
-  position = 'left',
   triggerStyle,
   labelStyle,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
   return (
     <View style={[styles.container, style]}>

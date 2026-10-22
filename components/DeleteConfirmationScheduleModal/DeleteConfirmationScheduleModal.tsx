@@ -7,11 +7,7 @@ import {
   View,
 } from 'react-native';
 import BaseModal from '../BaseModal/BaseModal';
-import useIrrigation, {
-  Schedule,
-  Subzone,
-  Zone,
-} from '../../hooks/useIrrigation.hook';
+import useIrrigation, {Schedule} from '../../hooks/useIrrigation.hook';
 
 interface DeleteScheduleConfirmationModalProps {
   schedule?: Schedule;

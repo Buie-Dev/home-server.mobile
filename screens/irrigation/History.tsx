@@ -107,7 +107,6 @@ function History() {
     deleteHistory,
     loading,
     loadingMore,
-    hasMore,
   } = useHistory();
   const {zoneDetails, fetchZones} = useIrrigation();
   const {useGallons, toggleUnit} = useUnit();

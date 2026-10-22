@@ -12,11 +12,6 @@ export enum WEBSOCKET_TOPICS {
   ROWING_FINISH = 'rowing/finish',
 }
 
-interface MessagePayload {
-  topic: WEBSOCKET_TOPICS;
-  message: string;
-}
-
 interface WebSocketContextType {
   sendMessage: (topic: string, message: any) => void;
   latestCurrentStates: Array<CurrentState>;

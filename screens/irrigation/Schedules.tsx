@@ -37,7 +37,7 @@ const formatDaysLabel = (s: Schedule) => {
   if (active.length === 5 && !s.saturday && !s.sunday) return 'Weekdays';
   if (active.length === 6 && !s.sunday) return 'Weekdays + Sat';
   if (active.length === 6 && !s.saturday) return 'Weekdays + Sun';
-  return active.map((k, i) => DAYS[DAY_KEYS.indexOf(k)]).join(', ');
+  return active.map(k => DAYS[DAY_KEYS.indexOf(k)]).join(', ');
 };
 
 function Schedules(): ReactElement {

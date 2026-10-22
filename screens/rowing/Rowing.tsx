@@ -1,10 +1,4 @@
-import React, {
-  ReactElement,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, {ReactElement, useCallback, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
