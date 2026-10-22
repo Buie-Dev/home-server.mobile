@@ -139,14 +139,14 @@ function useIrrigation(): IrrigationInfo {
   };
 
   const formatZones = (): Array<Zone> => {
-    if (!latestCurrentStates || !zoneDetails.length) return [];
+    if (!latestCurrentStates || !zoneDetails.length) {return [];}
 
     const zones: Array<Zone> = [];
     for (const zoneDetail of zoneDetails) {
       const latestCurrentState = latestCurrentStates.find(
         lz => lz.id === zoneDetail.zone,
       );
-      if (!latestCurrentState) continue;
+      if (!latestCurrentState) {continue;}
 
       const zone: Zone = {
         id: zoneDetail.id,
@@ -161,8 +161,8 @@ function useIrrigation(): IrrigationInfo {
           const latestSubzone = latestCurrentState.subzones.find(
             slz => slz.id === zoneDetailSubzone.subzone,
           );
-          if (!latestSubzone) continue;
-          if (!zone.subzones) zone.subzones = [];
+          if (!latestSubzone) {continue;}
+          if (!zone.subzones) {zone.subzones = [];}
           const subzone: Subzone = {
             id: zoneDetailSubzone.id,
             name: zoneDetailSubzone.name,
@@ -178,14 +178,14 @@ function useIrrigation(): IrrigationInfo {
   };
 
   const formatQueue = (): Array<PriorityQueue> => {
-    if (!latestCurrentQueueStates || !zoneDetails.length) return [];
+    if (!latestCurrentQueueStates || !zoneDetails.length) {return [];}
 
     const priorityQueue = [];
     for (const latestCurrentQueueState of latestCurrentQueueStates) {
       const zoneDetail = zoneDetails.find(
         zd => zd.zone === latestCurrentQueueState.zone,
       );
-      if (!zoneDetail) continue;
+      if (!zoneDetail) {continue;}
 
       const queueSubZones: Array<QueueSubzone> = [];
       if (latestCurrentQueueState.subzones && zoneDetail.subzones) {
@@ -193,7 +193,7 @@ function useIrrigation(): IrrigationInfo {
           const subZone = zoneDetail.subzones.find(
             slz => slz.subzone === subState.id,
           );
-          if (!subZone) continue;
+          if (!subZone) {continue;}
           queueSubZones.push({
             name: subZone.name,
             id: subState.id,
@@ -211,7 +211,7 @@ function useIrrigation(): IrrigationInfo {
         priority: latestCurrentQueueState.priority,
         subZones: queueSubZones ? queueSubZones : undefined,
         startTime: latestCurrentQueueState.start_time
-          ? parseInt(latestCurrentQueueState.start_time)
+          ? parseInt(latestCurrentQueueState.start_time, 10)
           : undefined,
       };
       priorityQueue.push(queueItem);

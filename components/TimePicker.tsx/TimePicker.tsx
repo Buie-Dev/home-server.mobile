@@ -15,10 +15,10 @@ const TimePicker: React.FC<TimePickerProps> = ({onChange, hour, minute}) => {
   const changeTime = (hour: string, minute: string) => {
     let localHour = hour;
     let localMinute = minute;
-    if (parseInt(hour) > 23) {
+    if (parseInt(hour, 10) > 23) {
       localHour = '23';
     }
-    if (parseInt(minute) > 59) {
+    if (parseInt(minute, 10) > 59) {
       localMinute = '59';
     }
     onChange(localHour, localMinute);
