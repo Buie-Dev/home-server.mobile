@@ -1,5 +1,6 @@
 import {useRef, useState} from 'react';
 import * as historyApi from '../api/history.api';
+import {logger} from '../lib/logger';
 
 export type IrrigationRun = {
   id: number;
@@ -103,7 +104,7 @@ function useHistory(): HistoryInfo {
         return prev;
       });
     } catch (e) {
-      console.error('deleteHistory', e);
+      logger.error('deleteHistory', e);
     }
   };
 

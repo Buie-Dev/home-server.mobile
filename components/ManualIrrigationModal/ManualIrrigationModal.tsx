@@ -12,6 +12,7 @@ import {Subzone, Zone} from '../../hooks/useIrrigation.hook';
 import Checkbox from '../Checkbox/Checkbox';
 import {useWebSocket} from '../../context/WebSocketContext';
 import {COLORS, SPACING} from '../../lib/theme';
+import {logger} from '../../lib/logger';
 
 interface ManualIrrigationModelProps {
   open: boolean;
@@ -38,9 +39,9 @@ function ManualIrrigationModel({
   }, [zone]);
 
   const onCheckSubzones = (sz: SubzoneControl) => {
-    console.log(sz);
-    console.log(sz.isChecked);
-    console.log(!sz.isChecked);
+    logger.log(sz);
+    logger.log(sz.isChecked);
+    logger.log(!sz.isChecked);
 
     setSubzones(prev =>
       prev.map(s => (s.id === sz.id ? {...s, isChecked: !s.isChecked} : s)),
@@ -49,8 +50,8 @@ function ManualIrrigationModel({
 
   const startZone = () => {
     if (!time) {return;}
-    console.log(subzones);
-    console.log(
+    logger.log(subzones);
+    logger.log(
       subzones
         .filter(sz => sz.isChecked)
         .map(sz => ({id: sz.subzone, state: 1})),
@@ -67,8 +68,8 @@ function ManualIrrigationModel({
   };
 
   useEffect(() => {
-    console.log(subzones);
-    console.log(
+    logger.log(subzones);
+    logger.log(
       subzones
         .filter(sz => sz.isChecked)
         .map(sz => ({id: sz.subzone, state: 1})),

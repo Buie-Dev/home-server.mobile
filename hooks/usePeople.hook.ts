@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import * as peopleApi from '../api/people.api';
+import {logger} from '../lib/logger';
 
 export type TrackedPerson = {
   id: number;
@@ -42,7 +43,7 @@ function usePeople() {
       const data = await peopleApi.fetchPeople();
       setPeople(data as TrackedPerson[]);
     } catch (e) {
-      console.error('fetchPeople', e);
+      logger.error('fetchPeople', e);
     }
   };
 
@@ -61,7 +62,7 @@ function usePeople() {
       const data = await peopleApi.fetchCategories({personId});
       setCategories(data as PersonCategory[]);
     } catch (e) {
-      console.error('fetchCategories', e);
+      logger.error('fetchCategories', e);
     }
   };
 
@@ -83,7 +84,7 @@ function usePeople() {
       });
       setIdeas(data as PersonIdea[]);
     } catch (e) {
-      console.error('fetchIdeas', e);
+      logger.error('fetchIdeas', e);
     } finally {
       setLoading(false);
     }

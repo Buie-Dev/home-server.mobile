@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {logger} from '../lib/logger';
 import * as irrigationApi from '../api/irrigation.api';
 import {useWebSocket} from '../context/WebSocketContext';
 
@@ -134,7 +135,7 @@ function useIrrigation(): IrrigationInfo {
       const zoneTypes = await irrigationApi.fetchZoneTypes();
       setZoneTypes(zoneTypes as Array<ZoneType>);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     }
   };
 
@@ -232,7 +233,7 @@ function useIrrigation(): IrrigationInfo {
       const schedules = await irrigationApi.fetchSchedules(zoneId, subzoneId);
       setSchedules(schedules as Array<Schedule>);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     }
   };
 
@@ -240,7 +241,7 @@ function useIrrigation(): IrrigationInfo {
     try {
       await irrigationApi.createSchedule(data);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     }
   };
 
@@ -248,7 +249,7 @@ function useIrrigation(): IrrigationInfo {
     try {
       await irrigationApi.updateSchedule(id, data);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     }
   };
 
@@ -256,7 +257,7 @@ function useIrrigation(): IrrigationInfo {
     try {
       await irrigationApi.deleteSchedule(id);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     }
   };
 
@@ -264,7 +265,7 @@ function useIrrigation(): IrrigationInfo {
     try {
       return (await irrigationApi.checkScheduleSync()) as SyncStatus;
     } catch (error) {
-      console.log(error);
+      logger.log(error);
       return null;
     }
   };
@@ -273,7 +274,7 @@ function useIrrigation(): IrrigationInfo {
     try {
       return (await irrigationApi.forceScheduleSync()) as {synced: number};
     } catch (error) {
-      console.log(error);
+      logger.log(error);
       return null;
     }
   };
@@ -283,7 +284,7 @@ function useIrrigation(): IrrigationInfo {
       await irrigationApi.toggleSchedule(id, active);
       await fetchSchedules();
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     }
   };
 
@@ -291,7 +292,7 @@ function useIrrigation(): IrrigationInfo {
     try {
       await irrigationApi.reorderSchedules(ids);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     }
   };
 
@@ -300,7 +301,7 @@ function useIrrigation(): IrrigationInfo {
       const zones = await irrigationApi.fetchZones(zoneTypeId);
       setZoneDetails(zones as Array<ZoneDetail>);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
     }
   };
 
@@ -309,7 +310,7 @@ function useIrrigation(): IrrigationInfo {
       await irrigationApi.healthCheck();
       setConnected(true);
     } catch (error) {
-      console.error('Health check failed:', error);
+      logger.error('Health check failed:', error);
       setConnected(false);
     }
   };

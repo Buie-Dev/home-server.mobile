@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import * as devicesApi from '../api/devices.api';
+import {logger} from '../lib/logger';
 import {useWebSocket} from '../context/WebSocketContext';
 
 export type Device = {
@@ -46,7 +47,7 @@ function useDevices(): DevicesInfo {
       }));
       setDevices(withStatus);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
       setDevices([]);
     } finally {
       setLoading(false);

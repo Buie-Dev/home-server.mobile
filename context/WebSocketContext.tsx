@@ -2,6 +2,7 @@ import React, {createContext, useContext, useEffect, useState} from 'react';
 import {AppState, AppStateStatus} from 'react-native';
 import {baseWebSocketUrl} from '../config/config';
 import {getToken} from '../lib/tokenStorage';
+import {logger} from '../lib/logger';
 
 export enum WEBSOCKET_TOPICS {
   CURRENT_STATE = 'current',
@@ -92,7 +93,7 @@ export const WebSocketProvider: React.FC<{children: React.ReactNode}> = ({
     let socket: WebSocket;
 
     const connect = async () => {
-      console.log('Connecting to WebSocket...');
+      logger.log('Connecting to WebSocket...');
       const token = await getToken();
       const url = token
         ? `${baseWebSocketUrl}?token=${token}`
@@ -100,7 +101,7 @@ export const WebSocketProvider: React.FC<{children: React.ReactNode}> = ({
       socket = new WebSocket(url);
 
       socket.onopen = () => {
-        console.log('Connected to WebSocket server');
+        logger.log('Connected to WebSocket server');
         setIsConnected(true);
       };
 
@@ -142,16 +143,16 @@ export const WebSocketProvider: React.FC<{children: React.ReactNode}> = ({
             );
             break;
           default:
-            console.log('Topic not handled:', content.topic);
+            logger.log('Topic not handled:', content.topic);
         }
       };
 
       socket.onerror = error => {
-        console.error('WebSocket Error:', error);
+        logger.error('WebSocket Error:', error);
       };
 
       socket.onclose = () => {
-        console.log('WebSocket Disconnected');
+        logger.log('WebSocket Disconnected');
         setIsConnected(false);
       };
 
@@ -162,9 +163,9 @@ export const WebSocketProvider: React.FC<{children: React.ReactNode}> = ({
 
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active') {
-        console.log('App has come to the foreground — reconnecting WebSocket');
+        logger.log('App has come to the foreground — reconnecting WebSocket');
         if (!socket || socket.readyState !== WebSocket.OPEN) {
-          connect().catch(console.error);
+          connect().catch(logger.error);
         }
       }
     };
@@ -185,7 +186,7 @@ export const WebSocketProvider: React.FC<{children: React.ReactNode}> = ({
       const payload = JSON.stringify({topic, message});
       ws.send(payload);
     } else {
-      console.error('WebSocket is not connected.');
+      logger.error('WebSocket is not connected.');
     }
   };
 

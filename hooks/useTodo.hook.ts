@@ -1,5 +1,6 @@
 import {useRef, useState} from 'react';
 import * as todoApi from '../api/todo.api';
+import {logger} from '../lib/logger';
 
 export type TodoSubcategory = {id: number; name: string; categoryId: number};
 export type TodoCategory = {
@@ -85,7 +86,7 @@ function useTodo() {
       const data = await todoApi.fetchCategories();
       setCategories(data as TodoCategory[]);
     } catch (e) {
-      console.error('fetchCategories', e);
+      logger.error('fetchCategories', e);
     }
   };
 
@@ -99,7 +100,7 @@ function useTodo() {
       const data = await todoApi.fetchTemplates(categoryId, subcategoryId);
       setTemplates(data as TodoTemplate[]);
     } catch (e) {
-      console.error('fetchTemplates', e);
+      logger.error('fetchTemplates', e);
     } finally {
       setLoading(false);
     }
@@ -111,7 +112,7 @@ function useTodo() {
       const data = await todoApi.fetchTemplates(categoryId, subcategoryId);
       setTemplates(data as TodoTemplate[]);
     } catch (e) {
-      console.error('refetchTemplates', e);
+      logger.error('refetchTemplates', e);
     }
   };
 
@@ -122,7 +123,7 @@ function useTodo() {
       const data = await todoApi.fetchTasks(categoryId, subcategoryId);
       setTasks(data as TodoTask[]);
     } catch (e) {
-      console.error('fetchTasks', e);
+      logger.error('fetchTasks', e);
     } finally {
       setLoading(false);
     }
@@ -134,7 +135,7 @@ function useTodo() {
       const data = await todoApi.fetchTasks(categoryId, subcategoryId);
       setTasks(data as TodoTask[]);
     } catch (e) {
-      console.error('refetchTasks', e);
+      logger.error('refetchTasks', e);
     }
   };
 
@@ -208,7 +209,7 @@ function useTodo() {
       const data = await todoApi.fetchHistory(categoryId, subcategoryId);
       setHistory(data as TodoHistoryItem[]);
     } catch (e) {
-      console.error('fetchHistory', e);
+      logger.error('fetchHistory', e);
     } finally {
       setLoading(false);
     }
@@ -220,7 +221,7 @@ function useTodo() {
       const data = await todoApi.fetchHistory(categoryId, subcategoryId);
       setHistory(data as TodoHistoryItem[]);
     } catch (e) {
-      console.error('refetchHistory', e);
+      logger.error('refetchHistory', e);
     }
   };
 

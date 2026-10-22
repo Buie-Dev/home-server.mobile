@@ -21,6 +21,15 @@ afterEach(() => {
 // Import after mocks are set up
 import useIrrigation from '../../hooks/useIrrigation.hook';
 
+// Helper to render hook and wait for mount effects (fetchZones, healthCheck) to settle
+const renderAndWaitForMount = async () => {
+  const hook = renderHook(() => useIrrigation());
+  await waitFor(() => {
+    expect(mockedApi.fetchZones).toHaveBeenCalled();
+  });
+  return hook;
+};
+
 describe('useIrrigation', () => {
   it('fetches zones and runs health check on mount', async () => {
     renderHook(() => useIrrigation());
@@ -60,7 +69,7 @@ describe('useIrrigation', () => {
   it('fetchSchedules calls API and updates state', async () => {
     const schedules = [{id: 1, name: 'Morning', zoneName: 'Front'}];
     mockedApi.fetchSchedules.mockResolvedValue(schedules);
-    const {result} = renderHook(() => useIrrigation());
+    const {result} = await renderAndWaitForMount();
 
     await act(async () => {
       await result.current.fetchSchedules(1);
@@ -72,7 +81,7 @@ describe('useIrrigation', () => {
 
   it('createSchedule calls API', async () => {
     mockedApi.createSchedule.mockResolvedValue({});
-    const {result} = renderHook(() => useIrrigation());
+    const {result} = await renderAndWaitForMount();
     const data = {
       name: 'test',
       startTime: '08:00',
@@ -97,7 +106,7 @@ describe('useIrrigation', () => {
   it('toggleSchedule calls API and refetches schedules', async () => {
     mockedApi.toggleSchedule.mockResolvedValue({});
     mockedApi.fetchSchedules.mockResolvedValue([]);
-    const {result} = renderHook(() => useIrrigation());
+    const {result} = await renderAndWaitForMount();
 
     await act(async () => {
       await result.current.toggleSchedule(1, true);
@@ -108,7 +117,7 @@ describe('useIrrigation', () => {
   });
 
   it('stopAll sends WebSocket message', async () => {
-    const {result} = renderHook(() => useIrrigation());
+    const {result} = await renderAndWaitForMount();
     act(() => {
       result.current.stopAll();
     });
@@ -116,7 +125,7 @@ describe('useIrrigation', () => {
   });
 
   it('stopQueueItem sends WebSocket message with id', async () => {
-    const {result} = renderHook(() => useIrrigation());
+    const {result} = await renderAndWaitForMount();
     act(() => {
       result.current.stopQueueItem('abc');
     });
@@ -133,7 +142,7 @@ describe('useIrrigation', () => {
       extra_in_automation: [],
     };
     mockedApi.checkScheduleSync.mockResolvedValue(syncStatus);
-    const {result} = renderHook(() => useIrrigation());
+    const {result} = await renderAndWaitForMount();
 
     let status;
     await act(async () => {
@@ -145,7 +154,7 @@ describe('useIrrigation', () => {
 
   it('checkSync returns null on error', async () => {
     mockedApi.checkScheduleSync.mockRejectedValue(new Error('fail'));
-    const {result} = renderHook(() => useIrrigation());
+    const {result} = await renderAndWaitForMount();
 
     let status;
     await act(async () => {

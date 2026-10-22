@@ -1,5 +1,6 @@
 import {get, post, put, del} from './base.api';
 import {AUTH, ADMIN} from './apiRoutes';
+import {logger} from '../lib/logger';
 
 interface LoginResponse {
   token: string;
@@ -9,7 +10,7 @@ export const loginRequest = (
   username: string,
   password: string,
 ): Promise<LoginResponse> => {
-  console.log('[auth] POST', `${AUTH}/login`);
+  logger.log('[auth] POST', `${AUTH}/login`);
   return post<LoginResponse>(`${AUTH}/login`, {username, password});
 };
 

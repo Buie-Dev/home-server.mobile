@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import * as meganApi from '../api/megan.api';
+import {logger} from '../lib/logger';
 
 export type MeganSubcategory = {
   id: number;
@@ -36,7 +37,7 @@ function useMegan() {
       const data = await meganApi.fetchCategories();
       setCategories(data as MeganCategory[]);
     } catch (e) {
-      console.error('fetchCategories', e);
+      logger.error('fetchCategories', e);
     }
   };
 
@@ -46,7 +47,7 @@ function useMegan() {
       const data = await meganApi.fetchIdeas(categoryId, subcategoryId);
       setIdeas(data as MeganIdea[]);
     } catch (e) {
-      console.error('fetchIdeas', e);
+      logger.error('fetchIdeas', e);
     } finally {
       setLoading(false);
     }

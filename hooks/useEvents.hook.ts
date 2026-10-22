@@ -1,5 +1,6 @@
 import {useRef, useState} from 'react';
 import * as eventsApi from '../api/events.api';
+import {logger} from '../lib/logger';
 
 export type EventSubcategory = {id: number; name: string; categoryId: number};
 export type EventCategory = {
@@ -58,7 +59,7 @@ function useEvents() {
       });
       setEvents(data as CalendarEvent[]);
     } catch (e) {
-      console.error('fetchEvents', e);
+      logger.error('fetchEvents', e);
     } finally {
       setLoading(false);
     }
@@ -75,7 +76,7 @@ function useEvents() {
       });
       setEvents(data as CalendarEvent[]);
     } catch (e) {
-      console.error('refetchEvents', e);
+      logger.error('refetchEvents', e);
     }
   };
 
@@ -84,7 +85,7 @@ function useEvents() {
       const data = await eventsApi.fetchCategories();
       setCategories(data as EventCategory[]);
     } catch (e) {
-      console.error('fetchCategories', e);
+      logger.error('fetchCategories', e);
     }
   };
 
