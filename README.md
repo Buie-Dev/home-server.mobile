@@ -1,6 +1,6 @@
-![CI](https://github.com/Buie-Dev/home-server.app/actions/workflows/ci.yml/badge.svg?branch=dev)
+![CI](https://github.com/Buie-Dev/home-server.mobile/actions/workflows/ci.yml/badge.svg?branch=dev)
 
-# home-server.app
+# home-server.mobile
 
 React Native mobile app I use to control my home server and personal apps from my phone.
 

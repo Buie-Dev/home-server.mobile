@@ -6,7 +6,7 @@ Rewrite README.md to present the project clearly for employers.
 
 ## Context
 
-The current README covers setup and environment but lacks a summary, motivation, links to related repos, and a description of how I work on the project. It also uses the old name "HomeApp" instead of "home-server.app".
+The current README covers setup and environment but lacks a summary, motivation, links to related repos, and a description of how I work on the project. It also uses the old name "HomeApp" instead of "home-server.mobile".
 
 ## Scope
 
