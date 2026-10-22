@@ -339,7 +339,6 @@ export function useRowing(): UseRowingReturn {
       });
       await fetchAllCrews();
       if (activeRace) await loadRace({id: activeRace.id});
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [fetchAllCrews, activeRace],
   );
