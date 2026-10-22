@@ -102,6 +102,7 @@ function useMegan() {
     },
   ) => {
     await meganApi.updateIdea(id, data);
+    await fetchIdeas();
   };
 
   const toggleIdea = async (id: number, completed: boolean) => {

@@ -71,8 +71,9 @@ describe('useMegan', () => {
     expect(mockedApi.fetchIdeas).toHaveBeenCalled();
   });
 
-  it('updateIdea calls API but does not refetch', async () => {
+  it('updateIdea calls API and refetches ideas', async () => {
     mockedApi.updateIdea.mockResolvedValue({});
+    mockedApi.fetchIdeas.mockResolvedValue([]);
     const {result} = renderHook(() => useMegan());
 
     await act(async () => {
@@ -83,7 +84,7 @@ describe('useMegan', () => {
       title: 'Updated',
       categoryId: 1,
     });
-    expect(mockedApi.fetchIdeas).not.toHaveBeenCalled();
+    expect(mockedApi.fetchIdeas).toHaveBeenCalled();
   });
 
   it('toggleIdea updates local state optimistically', async () => {
