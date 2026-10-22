@@ -70,7 +70,7 @@ function useHistory(): HistoryInfo {
   };
 
   const loadMore = async () => {
-    if (loadingMore || !hasMore) return;
+    if (loadingMore || !hasMore) {return;}
     setLoadingMore(true);
     try {
       const data = await historyApi.fetchHistory({
@@ -91,7 +91,7 @@ function useHistory(): HistoryInfo {
     await historyApi.deleteHistory(id);
     setHistory(prev => prev.filter(r => r.id !== id));
     setTotals(prev => {
-      if (!prev) return prev;
+      if (!prev) {return prev;}
       // Refresh totals from the server to reflect the deletion
       historyApi
         .fetchHistoryTotals({

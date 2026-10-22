@@ -92,7 +92,7 @@ function AddTaskModal({
   const [month, setMonth] = useState<number>(1);
 
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) {return;}
     setTitle('');
     setNotes('');
     setSelectedCategoryId(null);

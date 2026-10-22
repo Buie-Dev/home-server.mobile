@@ -32,7 +32,7 @@ function ZoneFilterBar({zoneDetails, onChange}: Props) {
     null,
   );
 
-  if (zoneDetails.length === 0) return null;
+  if (zoneDetails.length === 0) {return null;}
 
   const groupedZones = zoneDetails.reduce<Record<string, ZoneDetail[]>>(
     (acc, zone) => {

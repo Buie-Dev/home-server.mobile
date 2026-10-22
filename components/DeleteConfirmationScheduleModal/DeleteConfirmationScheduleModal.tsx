@@ -23,7 +23,7 @@ function DeleteScheduleConfirmationModal({
   const {deleteSchedule} = useIrrigation();
 
   const onDeleteSchedule = async () => {
-    if (!schedule) return;
+    if (!schedule) {return;}
     await deleteSchedule(schedule.id);
     onDelete();
   };

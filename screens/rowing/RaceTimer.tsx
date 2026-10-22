@@ -58,14 +58,14 @@ function formatTime({ts}: {ts: number}): string {
 }
 
 function statusBadgeColor({status}: {status: RaceStatus}): string {
-  if (status === 'active') return COLORS.success;
-  if (status === 'completed') return COLORS.textMuted;
+  if (status === 'active') {return COLORS.success;}
+  if (status === 'completed') {return COLORS.textMuted;}
   return COLORS.warning;
 }
 
 function statusBadgeLabel({status}: {status: RaceStatus}): string {
-  if (status === 'active') return 'Active';
-  if (status === 'completed') return 'Completed';
+  if (status === 'active') {return 'Active';}
+  if (status === 'completed') {return 'Completed';}
   return 'Pending';
 }
 
@@ -74,9 +74,9 @@ function raceTypeBadgeLabel({raceType}: {raceType: RaceType}): string {
 }
 
 function placementEmoji({placement}: {placement: number}): string {
-  if (placement === 1) return '🥇';
-  if (placement === 2) return '🥈';
-  if (placement === 3) return '🥉';
+  if (placement === 1) {return '🥇';}
+  if (placement === 2) {return '🥈';}
+  if (placement === 3) {return '🥉';}
   return `#${placement}`;
 }
 
@@ -288,7 +288,7 @@ function RaceTimer(): ReactElement {
   }, [latestRowingFinishEvent, raceId, loadRace]);
 
   const orderedEntries = useMemo<RaceEntry[]>(() => {
-    if (!race) return [];
+    if (!race) {return [];}
 
     if (race.status === 'completed') {
       if (rankBy === 'wbt') {
@@ -298,9 +298,9 @@ function RaceTimer(): ReactElement {
       }
       return [...race.entries].sort((a, b) => {
         if (a.placement !== null && b.placement !== null)
-          return a.placement - b.placement;
-        if (a.placement !== null) return -1;
-        if (b.placement !== null) return 1;
+          {return a.placement - b.placement;}
+        if (a.placement !== null) {return -1;}
+        if (b.placement !== null) {return 1;}
         return 0;
       });
     }
@@ -314,9 +314,9 @@ function RaceTimer(): ReactElement {
       return [...race.entries].sort((a, b) => {
         const ai = order.indexOf(a.id);
         const bi = order.indexOf(b.id);
-        if (ai === -1 && bi === -1) return 0;
-        if (ai === -1) return 1;
-        if (bi === -1) return -1;
+        if (ai === -1 && bi === -1) {return 0;}
+        if (ai === -1) {return 1;}
+        if (bi === -1) {return -1;}
         return ai - bi;
       });
     }
@@ -325,7 +325,7 @@ function RaceTimer(): ReactElement {
   }, [race, rankBy]);
 
   const allStarted = useMemo(() => {
-    if (!race) return false;
+    if (!race) {return false;}
     return race.entries.every(
       e =>
         e.startTime !== null ||
@@ -336,12 +336,12 @@ function RaceTimer(): ReactElement {
   }, [race, liveStarts]);
 
   const allDone = useMemo(() => {
-    if (!race) return false;
+    if (!race) {return false;}
     return race.entries.every(e => e.elapsedMs !== null || e.dns || e.dnf);
   }, [race]);
 
   const handleStartAll = useCallback(async () => {
-    if (!race) return;
+    if (!race) {return;}
     const now = Date.now();
     const newStarts: Record<number, number> = {};
     const pending = race.entries.filter(

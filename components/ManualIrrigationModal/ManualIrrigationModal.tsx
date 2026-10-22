@@ -48,7 +48,7 @@ function ManualIrrigationModel({
   };
 
   const startZone = () => {
-    if (!time) return;
+    if (!time) {return;}
     console.log(subzones);
     console.log(
       subzones

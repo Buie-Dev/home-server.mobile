@@ -24,7 +24,7 @@ export const UnitProvider = ({children}: {children: React.ReactNode}) => {
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY).then(val => {
-      if (val === 'gallons') setUseGallons(true);
+      if (val === 'gallons') {setUseGallons(true);}
     });
   }, []);
 

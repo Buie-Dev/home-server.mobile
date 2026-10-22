@@ -33,10 +33,10 @@ const DAY_KEYS: (keyof Schedule)[] = [
 
 const formatDaysLabel = (s: Schedule) => {
   const active = DAY_KEYS.filter(k => s[k]);
-  if (active.length === 7) return 'Every day';
-  if (active.length === 5 && !s.saturday && !s.sunday) return 'Weekdays';
-  if (active.length === 6 && !s.sunday) return 'Weekdays + Sat';
-  if (active.length === 6 && !s.saturday) return 'Weekdays + Sun';
+  if (active.length === 7) {return 'Every day';}
+  if (active.length === 5 && !s.saturday && !s.sunday) {return 'Weekdays';}
+  if (active.length === 6 && !s.sunday) {return 'Weekdays + Sat';}
+  if (active.length === 6 && !s.saturday) {return 'Weekdays + Sun';}
   return active.map(k => DAYS[DAY_KEYS.indexOf(k)]).join(', ');
 };
 
@@ -122,10 +122,10 @@ function Schedules(): ReactElement {
         onPress: async () => {
           const r = await forceSync();
           if (r)
-            Alert.alert(
+            {Alert.alert(
               'Synced',
               `${r.synced} schedule(s) re-synced to automation service.`,
-            );
+            );}
         },
       },
     ]);

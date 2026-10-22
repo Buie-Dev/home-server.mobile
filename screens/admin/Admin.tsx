@@ -90,7 +90,7 @@ function Admin(): ReactElement {
   };
 
   const handleAddUser = async (): Promise<void> => {
-    if (!newUsername.trim() || !newPassword) return;
+    if (!newUsername.trim() || !newPassword) {return;}
     setAdding(true);
     try {
       await createUser({username: newUsername.trim(), password: newPassword});

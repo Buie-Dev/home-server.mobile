@@ -85,7 +85,7 @@ function ManageCategoriesModal({
         text: 'Delete',
         style: 'destructive',
         onPress: () => {
-          if (editingCategory?.id === cat.id) cancelEdit();
+          if (editingCategory?.id === cat.id) {cancelEdit();}
           onDeleteCategory(cat.id);
         },
       },
@@ -111,7 +111,7 @@ function ManageCategoriesModal({
   };
 
   const handleUpdate = async () => {
-    if (!categoryNameInput.trim() || !editingCategory) return;
+    if (!categoryNameInput.trim() || !editingCategory) {return;}
     setSaving(true);
     try {
       if (categoryNameInput.trim() !== editingCategory.name) {

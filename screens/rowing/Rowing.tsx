@@ -51,7 +51,7 @@ function addDays({dateStr, delta}: {dateStr: string; delta: number}): string {
 
 function formatDateLabel({dateStr}: {dateStr: string}): string {
   const today = getTodayStr();
-  if (dateStr === today) return 'Today';
+  if (dateStr === today) {return 'Today';}
   const d = new Date(dateStr + 'T12:00:00');
   return d.toLocaleDateString('en-CA', {
     weekday: 'short',
@@ -69,14 +69,14 @@ function raceTypeBadgeLabel({raceType}: {raceType: RaceType}): string {
 }
 
 function statusBadgeColor({status}: {status: string}): string {
-  if (status === 'active') return COLORS.success;
-  if (status === 'completed') return COLORS.textMuted;
+  if (status === 'active') {return COLORS.success;}
+  if (status === 'completed') {return COLORS.textMuted;}
   return COLORS.warning;
 }
 
 function statusBadgeLabel({status}: {status: string}): string {
-  if (status === 'active') return 'Active';
-  if (status === 'completed') return 'Completed';
+  if (status === 'active') {return 'Active';}
+  if (status === 'completed') {return 'Completed';}
   return 'Pending';
 }
 
@@ -340,10 +340,10 @@ function seatLabel({
   key: SeatKey;
   crewCount: number;
 }): string {
-  if (key === 'cox') return 'Cox';
+  if (key === 'cox') {return 'Cox';}
   const num = parseInt(key.replace('seat', ''), 10);
-  if (num === 1) return 'Stroke';
-  if (num === crewCount) return 'Bow';
+  if (num === 1) {return 'Stroke';}
+  if (num === crewCount) {return 'Bow';}
   return `Seat ${num}`;
 }
 
@@ -414,7 +414,7 @@ function CrewModal({
   const hasCox = boatClass?.hasCox ?? false;
 
   const activeSeatKeys = ALL_SEAT_KEYS.filter(k => {
-    if (k === 'cox') return hasCox;
+    if (k === 'cox') {return hasCox;}
     const num = parseInt(k.replace('seat', ''), 10);
     return num <= crewCount;
   });

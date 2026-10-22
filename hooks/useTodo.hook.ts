@@ -247,7 +247,7 @@ function useTodo() {
     month?: number;
   }) => {
     const templateId = await createTemplate(data);
-    if (templateId) await todoApi.addTask(templateId);
+    if (templateId) {await todoApi.addTask(templateId);}
   };
 
   const updateTask = async (

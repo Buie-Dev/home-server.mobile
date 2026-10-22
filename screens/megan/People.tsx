@@ -147,7 +147,7 @@ function People() {
           style: 'destructive',
           onPress: async () => {
             await deletePerson({personId: person.id});
-            if (selectedPersonId === person.id) setSelectedPersonId(undefined);
+            if (selectedPersonId === person.id) {setSelectedPersonId(undefined);}
           },
         },
       ],
@@ -159,25 +159,25 @@ function People() {
     setActiveCategoryId(next);
     setActiveSubcategoryId(undefined);
     if (selectedPersonId !== undefined)
-      fetchIdeas({personId: selectedPersonId, categoryId: next});
+      {fetchIdeas({personId: selectedPersonId, categoryId: next});}
   };
 
   const selectSubcategory = (id: number) => {
     const next = activeSubcategoryId === id ? undefined : id;
     setActiveSubcategoryId(next);
     if (selectedPersonId !== undefined)
-      fetchIdeas({
+      {fetchIdeas({
         personId: selectedPersonId,
         categoryId: activeCategoryId,
         subcategoryId: next,
-      });
+      });}
   };
 
   const clearFilter = () => {
     setActiveCategoryId(undefined);
     setActiveSubcategoryId(undefined);
     if (selectedPersonId !== undefined)
-      fetchIdeas({personId: selectedPersonId});
+      {fetchIdeas({personId: selectedPersonId});}
   };
 
   const handleSaveIdea = async (data: {
@@ -186,7 +186,7 @@ function People() {
     subcategoryId?: number;
     notes?: string;
   }) => {
-    if (!selectedPersonId) return;
+    if (!selectedPersonId) {return;}
     if (editingIdea) {
       await updateIdea({
         personId: selectedPersonId,
@@ -352,10 +352,10 @@ function People() {
                           onPress={() => {
                             setActiveSubcategoryId(undefined);
                             if (selectedPersonId !== undefined)
-                              fetchIdeas({
+                              {fetchIdeas({
                                 personId: selectedPersonId,
                                 categoryId: activeCategoryId,
-                              });
+                              });}
                           }}>
                           <Text
                             style={[

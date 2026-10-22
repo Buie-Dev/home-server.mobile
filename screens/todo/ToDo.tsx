@@ -169,7 +169,7 @@ const TaskDetailModal = ({
     setIsEditing(false);
   }, [task?.id]);
 
-  if (!task) return null;
+  if (!task) {return null;}
 
   const checklist: ChecklistItem[] = task.checklistItems ?? [];
   const sortedChecklist = [...checklist].sort(
@@ -272,7 +272,7 @@ const TaskDetailModal = ({
                   color={COLORS.textSecondary}
                 />
               </TouchableOpacity>
-              {!!task.completed ? (
+              {task.completed ? (
                 <View style={modalStyles.completedBadge}>
                   <Icon name="check-circle" size={16} color={COLORS.primary} />
                   <Text style={modalStyles.completedText}>Done</Text>
@@ -494,7 +494,7 @@ const TaskRow = ({
     <View
       style={[
         styles.rowAccent,
-        {backgroundColor: !!task.completed ? COLORS.success : COLORS.primary},
+        {backgroundColor: task.completed ? COLORS.success : COLORS.primary},
       ]}
     />
     <View style={styles.rowBody}>
@@ -657,7 +657,7 @@ const HistoryDetailModal = ({
     setIsEditing(false);
   }, [item?.id]);
 
-  if (!item) return null;
+  if (!item) {return null;}
 
   const startEditing = () => {
     setEditTitle(item.title);
@@ -931,9 +931,9 @@ function ToDo() {
   const subcategories = selectedCategory?.subcategories ?? [];
 
   const refetchActive = (tab: Tab, catId?: number, subId?: number) => {
-    if (tab === 'tasks') fetchTasks(catId, subId);
-    else if (tab === 'templates') fetchTemplates(catId, subId);
-    else fetchHistory(catId, subId);
+    if (tab === 'tasks') {fetchTasks(catId, subId);}
+    else if (tab === 'templates') {fetchTemplates(catId, subId);}
+    else {fetchHistory(catId, subId);}
   };
 
   const selectCategory = (id: number) => {

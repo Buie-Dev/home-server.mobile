@@ -38,10 +38,10 @@ const formatResponseTime = (ms?: number) =>
   ms !== undefined ? `${ms}ms` : null;
 
 const formatLastChecked = (date: Date | null) => {
-  if (!date) return 'Never checked';
+  if (!date) {return 'Never checked';}
   const diff = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (diff < 5) return 'Just now';
-  if (diff < 60) return `${diff}s ago`;
+  if (diff < 5) {return 'Just now';}
+  if (diff < 60) {return `${diff}s ago`;}
   return `${Math.floor(diff / 60)}m ago`;
 };
 
@@ -86,7 +86,7 @@ function Devices() {
     fetchDevices();
   }, []);
   useEffect(() => {
-    if (devices.length > 0) checkConnectivity();
+    if (devices.length > 0) {checkConnectivity();}
   }, [devices.length]);
 
   const onlineCount = devices.filter(d => d.status === 'online').length;

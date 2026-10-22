@@ -25,7 +25,7 @@ import {useUnit} from '../../context/UnitContext';
 const formatDuration = (seconds: number) => {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
-  if (m === 0) return `${s}s`;
+  if (m === 0) {return `${s}s`;}
   return s === 0 ? `${m}m` : `${m}m ${s}s`;
 };
 

@@ -79,12 +79,12 @@ type Section = {title: string; data: CalendarEvent[]};
 const groupByDate = ({events}: {events: CalendarEvent[]}): Section[] => {
   const sorted = [...events].sort((a, b) => {
     const d = a.date.localeCompare(b.date);
-    if (d !== 0) return d;
+    if (d !== 0) {return d;}
     return (a.time ?? '').localeCompare(b.time ?? '');
   });
   const groups: Record<string, CalendarEvent[]> = {};
   for (const ev of sorted) {
-    if (!groups[ev.date]) groups[ev.date] = [];
+    if (!groups[ev.date]) {groups[ev.date] = [];}
     groups[ev.date].push(ev);
   }
   return Object.entries(groups).map(([date, data]) => ({
@@ -254,7 +254,7 @@ function AddEditEventModal({
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) {return;}
     if (event) {
       setTitle(event.title);
       setDescription(event.description ?? '');
@@ -371,8 +371,8 @@ function AddEditEventModal({
                 mode="date"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                 onChange={(_, selected) => {
-                  if (Platform.OS !== 'ios') setShowDatePicker(false);
-                  if (selected) setDate(selected);
+                  if (Platform.OS !== 'ios') {setShowDatePicker(false);}
+                  if (selected) {setDate(selected);}
                 }}
               />
             )}
@@ -422,8 +422,8 @@ function AddEditEventModal({
                     mode="time"
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={(_, selected) => {
-                      if (Platform.OS !== 'ios') setShowTimePicker(false);
-                      if (selected) setTime(selected);
+                      if (Platform.OS !== 'ios') {setShowTimePicker(false);}
+                      if (selected) {setTime(selected);}
                     }}
                   />
                 )}
@@ -644,7 +644,7 @@ function CalendarView({
   const eventsByDate = useMemo(() => {
     const map: Record<string, CalendarEvent[]> = {};
     for (const ev of events) {
-      if (!map[ev.date]) map[ev.date] = [];
+      if (!map[ev.date]) {map[ev.date] = [];}
       map[ev.date].push(ev);
     }
     return map;
@@ -698,13 +698,13 @@ function CalendarView({
     if (viewMonth === 0) {
       setViewYear(y => y - 1);
       setViewMonth(11);
-    } else setViewMonth(m => m - 1);
+    } else {setViewMonth(m => m - 1);}
   };
   const nextMonth = () => {
     if (viewMonth === 11) {
       setViewYear(y => y + 1);
       setViewMonth(0);
-    } else setViewMonth(m => m + 1);
+    } else {setViewMonth(m => m + 1);}
   };
 
   const handleSelectDate = ({dateStr}: {dateStr: string}) => {

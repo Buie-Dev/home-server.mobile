@@ -58,7 +58,7 @@ function CreateScheduleModal({
 
   useEffect(() => {
     fetchZones(zoneType?.id);
-    if (!editSchedule) setSelectedZone(undefined);
+    if (!editSchedule) {setSelectedZone(undefined);}
   }, [zoneType]);
 
   useEffect(() => {
@@ -101,13 +101,13 @@ function CreateScheduleModal({
   useEffect(() => {
     if (editSchedule && zones.length > 0 && !selectedZone) {
       const match = zones.find(z => z.id === editSchedule.zoneId);
-      if (match) setSelectedZone(match);
+      if (match) {setSelectedZone(match);}
     }
   }, [zones, editSchedule]);
 
   const onSavePress = async () => {
-    if (!selectedZone) return;
-    if (selectedZone.subzones && selectedSubzoneIds.length === 0) return;
+    if (!selectedZone) {return;}
+    if (selectedZone.subzones && selectedSubzoneIds.length === 0) {return;}
     if (
       !monday &&
       !tuesday &&
@@ -117,9 +117,9 @@ function CreateScheduleModal({
       !saturday &&
       !sunday
     )
-      return;
-    if (!name.trim() || !startHour.trim() || !startMinutes.trim()) return;
-    if (!duration.trim() || isNaN(+duration)) return;
+      {return;}
+    if (!name.trim() || !startHour.trim() || !startMinutes.trim()) {return;}
+    if (!duration.trim() || isNaN(+duration)) {return;}
 
     const params = {
       zoneId: selectedZone.id,

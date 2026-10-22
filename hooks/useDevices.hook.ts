@@ -54,7 +54,7 @@ function useDevices(): DevicesInfo {
   };
 
   const checkConnectivity = () => {
-    if (!isConnected || devices.length === 0) return;
+    if (!isConnected || devices.length === 0) {return;}
 
     const now = Date.now();
     pingTimestampsRef.current = Object.fromEntries(
@@ -65,7 +65,7 @@ function useDevices(): DevicesInfo {
 
     sendMessage('healthcheck/request', {});
 
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (timeoutRef.current) {clearTimeout(timeoutRef.current);}
     timeoutRef.current = setTimeout(() => {
       setDevices(prev =>
         prev.map(d =>
@@ -78,18 +78,18 @@ function useDevices(): DevicesInfo {
   };
 
   useEffect(() => {
-    if (latestHealthCheckResponses.length === 0) return;
+    if (latestHealthCheckResponses.length === 0) {return;}
 
     setDevices(prev =>
       prev.map(d => {
         const sentAt = pingTimestampsRef.current[d.id];
-        if (sentAt === undefined) return d;
+        if (sentAt === undefined) {return d;}
 
         const response = latestHealthCheckResponses.find(
           r => r.deviceId === d.id,
         );
         if (!response || !response.timestamp || response.timestamp < sentAt)
-          return d;
+          {return d;}
 
         const isHealthy = response.status === d.healthCheckResponse;
         const responseTimeMs = Date.now() - sentAt;
@@ -106,7 +106,7 @@ function useDevices(): DevicesInfo {
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) {clearTimeout(timeoutRef.current);}
     };
   }, []);
 

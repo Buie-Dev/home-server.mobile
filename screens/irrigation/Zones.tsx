@@ -43,9 +43,9 @@ function Zones(): ReactElement {
   }, []);
 
   const getZoneStatus = (z: Zone) => {
-    if (z.state) return 'active';
+    if (z.state) {return 'active';}
     const inQueue = priorityQueue.find(pq => pq.zone === z.zone);
-    if (inQueue) return 'queued';
+    if (inQueue) {return 'queued';}
     return 'idle';
   };
 

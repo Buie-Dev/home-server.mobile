@@ -338,7 +338,7 @@ export function useRowing(): UseRowingReturn {
         seat8,
       });
       await fetchAllCrews();
-      if (activeRace) await loadRace({id: activeRace.id});
+      if (activeRace) {await loadRace({id: activeRace.id});}
     },
     [fetchAllCrews, activeRace],
   );
@@ -432,7 +432,7 @@ export function useRowing(): UseRowingReturn {
         boatName,
         timestamp,
       });
-      if (activeRace) await loadRace({id: raceId});
+      if (activeRace) {await loadRace({id: raceId});}
     },
     [sendMessage, activeRace, loadRace],
   );
@@ -459,7 +459,7 @@ export function useRowing(): UseRowingReturn {
         timestamp,
         elapsedMs,
       });
-      if (activeRace) await loadRace({id: raceId});
+      if (activeRace) {await loadRace({id: raceId});}
     },
     [sendMessage, activeRace, loadRace],
   );
@@ -467,7 +467,7 @@ export function useRowing(): UseRowingReturn {
   const setEntryDns = useCallback(
     async ({entryId}: {entryId: number}) => {
       await markEntryDns({entryId});
-      if (activeRace) await loadRace({id: activeRace.id});
+      if (activeRace) {await loadRace({id: activeRace.id});}
     },
     [activeRace, loadRace],
   );
@@ -475,7 +475,7 @@ export function useRowing(): UseRowingReturn {
   const setEntryDnf = useCallback(
     async ({entryId}: {entryId: number}) => {
       await markEntryDnf({entryId});
-      if (activeRace) await loadRace({id: activeRace.id});
+      if (activeRace) {await loadRace({id: activeRace.id});}
     },
     [activeRace, loadRace],
   );
@@ -483,7 +483,7 @@ export function useRowing(): UseRowingReturn {
   const removeEntry = useCallback(
     async ({entryId}: {entryId: number}) => {
       await deleteEntry({entryId});
-      if (activeRace) await loadRace({id: activeRace.id});
+      if (activeRace) {await loadRace({id: activeRace.id});}
     },
     [activeRace, loadRace],
   );
