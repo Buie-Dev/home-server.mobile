@@ -88,20 +88,23 @@ function useHistory(): HistoryInfo {
   };
 
   const deleteHistory = async (id: number) => {
-    await historyApi.deleteHistory(id);
-    setHistory(prev => prev.filter(r => r.id !== id));
-    setTotals(prev => {
-      if (!prev) {return prev;}
-      // Refresh totals from the server to reflect the deletion
-      historyApi
-        .fetchHistoryTotals({
-          zoneId: filtersRef.current.zoneId,
-          subzoneId: filtersRef.current.subzoneId,
-        })
-        .then(data => setTotals(data as HistoryTotals))
-        .catch(() => {});
-      return prev;
-    });
+    try {
+      await historyApi.deleteHistory(id);
+      setHistory(prev => prev.filter(r => r.id !== id));
+      setTotals(prev => {
+        if (!prev) {return prev;}
+        historyApi
+          .fetchHistoryTotals({
+            zoneId: filtersRef.current.zoneId,
+            subzoneId: filtersRef.current.subzoneId,
+          })
+          .then(data => setTotals(data as HistoryTotals))
+          .catch(() => {});
+        return prev;
+      });
+    } catch (e) {
+      console.error('deleteHistory', e);
+    }
   };
 
   return {

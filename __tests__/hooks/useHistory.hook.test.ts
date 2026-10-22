@@ -134,6 +134,25 @@ describe('useHistory', () => {
     expect(result.current.history.find((r: any) => r.id === 2)).toBeUndefined();
   });
 
+  it('deleteHistory keeps item in state when API fails', async () => {
+    const rows = [{id: 1}, {id: 2}, {id: 3}];
+    mockedApi.fetchHistory.mockResolvedValue(rows);
+    mockedApi.fetchHistoryTotals.mockResolvedValue(makeTotals());
+    mockedApi.deleteHistory.mockRejectedValue(new Error('server error'));
+
+    const {result} = renderHook(() => useHistory());
+    await act(async () => {
+      await result.current.fetchHistory();
+    });
+
+    await act(async () => {
+      await result.current.deleteHistory(2);
+    });
+
+    expect(result.current.history).toHaveLength(3);
+    expect(result.current.history.find((r: any) => r.id === 2)).toBeDefined();
+  });
+
   it('fetchHistory resets to empty on error', async () => {
     mockedApi.fetchHistory.mockRejectedValue(new Error('fail'));
     mockedApi.fetchHistoryTotals.mockRejectedValue(new Error('fail'));
