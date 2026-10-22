@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const mockWebSocketValue = {
   sendMessage: jest.fn(),
   latestCurrentStates: [] as any[],

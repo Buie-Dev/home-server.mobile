@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {get, post, put, del, setUnauthorizedHandler} from '../../api/base.api';
+import {get, post, put, del} from '../../api/base.api';
 
 jest.mock('axios');
 jest.mock('../../lib/tokenStorage', () => ({

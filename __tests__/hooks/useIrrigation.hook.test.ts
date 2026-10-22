@@ -23,7 +23,7 @@ import useIrrigation from '../../hooks/useIrrigation.hook';
 
 describe('useIrrigation', () => {
   it('fetches zones and runs health check on mount', async () => {
-    const {result} = renderHook(() => useIrrigation());
+    renderHook(() => useIrrigation());
     await waitFor(() => {
       expect(mockedApi.fetchZones).toHaveBeenCalled();
       expect(mockedApi.healthCheck).toHaveBeenCalled();

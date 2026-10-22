@@ -1,4 +1,4 @@
-import {renderHook, act, waitFor} from '@testing-library/react-native';
+import {renderHook, act} from '@testing-library/react-native';
 import * as historyApi from '../../api/history.api';
 
 jest.mock('../../api/history.api');

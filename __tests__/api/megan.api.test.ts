@@ -2,14 +2,9 @@ import * as base from '../../api/base.api';
 import {
   fetchCategories,
   createCategory,
-  updateCategory,
-  deleteCategory,
   createSubcategory,
-  updateSubcategory,
-  deleteSubcategory,
   fetchIdeas,
   createIdea,
-  updateIdea,
   toggleIdea,
   deleteIdea,
 } from '../../api/megan.api';

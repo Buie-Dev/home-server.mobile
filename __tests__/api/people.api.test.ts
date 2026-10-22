@@ -5,14 +5,8 @@ import {
   deletePerson,
   fetchCategories,
   createCategory,
-  updateCategory,
-  deleteCategory,
-  createSubcategory,
-  updateSubcategory,
-  deleteSubcategory,
   fetchIdeas,
   createIdea,
-  updateIdea,
   deleteIdea,
 } from '../../api/people.api';
 

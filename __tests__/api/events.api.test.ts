@@ -6,11 +6,7 @@ import {
   deleteEvent,
   fetchCategories,
   createCategory,
-  updateCategory,
-  deleteCategory,
   createSubcategory,
-  updateSubcategory,
-  deleteSubcategory,
 } from '../../api/events.api';
 
 jest.mock('../../api/base.api');
