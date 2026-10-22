@@ -36,32 +36,32 @@ The `.env` file at the project root controls which server the app connects to. T
 Use the home server's local IP directly. Comment out or remove `REACT_APP_DOMAIN`:
 
 ```env
-REACT_APP_SERVER="192.168.1.94"
-REACT_APP_WEBSOCKET="192.168.1.94"
+REACT_APP_SERVER="192.168.x.x"
+REACT_APP_WEBSOCKET="192.168.x.x"
 REACT_APP_API_PORT="5001"
 REACT_APP_WEB_SOCKET_PORT="8765"
-# REACT_APP_DOMAIN="dandelionlane.ca"
+# REACT_APP_DOMAIN="example.com"
 ```
 
 The app will connect to:
-- REST API: `http://192.168.1.94:5001`
-- WebSocket: `ws://192.168.1.94:8765`
+- REST API: `http://192.168.x.x:5001`
+- WebSocket: `ws://192.168.x.x:8765`
 
 ### Production / Remote (outside home network)
 
 Set `REACT_APP_DOMAIN` to route all traffic through Cloudflare. When this is set it takes priority over the IP/port values:
 
 ```env
-REACT_APP_SERVER="192.168.1.94"
-REACT_APP_WEBSOCKET="192.168.1.94"
+REACT_APP_SERVER="192.168.x.x"
+REACT_APP_WEBSOCKET="192.168.x.x"
 REACT_APP_API_PORT="5001"
 REACT_APP_WEB_SOCKET_PORT="8765"
-REACT_APP_DOMAIN="dandelionlane.ca"
+REACT_APP_DOMAIN="example.com"
 ```
 
 The app will connect to:
-- REST API: `https://dandelionlane.ca/api`
-- WebSocket: `wss://dandelionlane.ca/ws`
+- REST API: `https://example.com/api`
+- WebSocket: `wss://example.com/ws`
 
 > After changing `.env`, restart Metro with `npm start` (or stop and re-run the build command) so the new values are picked up.
 
